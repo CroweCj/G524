@@ -41,5 +41,5 @@ build/
 \.[Vv]s/
 
 #vs .filters .user
-.filters 
-.user
+*.filters 
+*.user
