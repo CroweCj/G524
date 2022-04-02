@@ -1,10 +1,10 @@
-#ifndef OSIGHT_RADAR_OSIGHT_MEASURE_THREAD_H__
-#define OSIGHT_RADAR_OSIGHT_MEASURE_THREAD__H__
+#ifndef EXINOVA_G524_OSIGHT_MEASURE_THREAD_H__
+#define EXINOVA_G524_OSIGHT_MEASURE_THREAD__H__
 
 #include <QThread>
 #include <QMetaType>
 #include "osight_driver.h"
-#include "osight_def.h"
+#include "param_def.h"
 
 //×¢²á
 Q_DECLARE_METATYPE(PointCloudT::Ptr);
@@ -73,4 +73,4 @@ private:
     //½Ç·Ö±æÂÊ
     unsigned int mAngleRes;
 };
-#endif // OSIGHT_RADAR_OSIGHT_MEASURE_THREAD__H__
+#endif // EXINOVA_G524_OSIGHT_MEASURE_THREAD__H__

@@ -1,8 +1,8 @@
-#include "pcl_mainwindow.h"
+#include "mainwindow.h"
 #include <math.h>
 #include "osight_def.h"
 #define CLOUD_TEST
-PclMainWindow::PclMainWindow(QWidget* parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
@@ -113,7 +113,7 @@ PclMainWindow::PclMainWindow(QWidget* parent)
 
     init();
 }
-PclMainWindow::~PclMainWindow()
+MainWindow::~MainWindow()
 {
     if (mpThreadOne != NULL)
         mpThreadOne->deleteLater();
@@ -121,7 +121,7 @@ PclMainWindow::~PclMainWindow()
         mpThreadTwo->deleteLater();
 }
 
-void PclMainWindow::init()
+void MainWindow::init()
 {
     //雷达转速默认15
     ui.lineEdit_radar_speed->setText(QString::number(15));
@@ -145,12 +145,12 @@ void PclMainWindow::init()
     ui.qvtkWidget->update();
 }
 
-void PclMainWindow::setBackgroundColor(double r, double g, double b)
+void MainWindow::setBackgroundColor(double r, double g, double b)
 {
     viewer->setBackgroundColor(r, g, b);
 }
 
-void PclMainWindow::initSetAngleRes()
+void MainWindow::initSetAngleRes()
 {
     QString str = ui.comboBox__angle_res->currentText();
     double res = 0;
@@ -178,7 +178,7 @@ void PclMainWindow::initSetAngleRes()
     mpThreadTwo->setRadarAngleRes(res);
 }
 
-void PclMainWindow::initSetIntensity()
+void MainWindow::initSetIntensity()
 {
     unsigned char speed = ui.lineEdit_radar_speed->text().toUShort();
     if (speed < MIN_RADAR_SPEED)
@@ -198,7 +198,7 @@ void PclMainWindow::initSetIntensity()
     mpThreadTwo->setRadarSpeed(speed);
 }
 
-void PclMainWindow::initSetSpeed()
+void MainWindow::initSetSpeed()
 {
     mpThreadOne->setRadarIntensity(ui.comboBox_intensity->currentText().toShort());
     mpThreadTwo->setRadarIntensity(ui.comboBox_intensity->currentText().toShort());

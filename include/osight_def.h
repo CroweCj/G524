@@ -1,10 +1,6 @@
 #pragma once
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-
-typedef pcl::PointXYZRGB PointT;
-typedef pcl::PointCloud<PointT> PointCloudT;
-
+//雷达信息定义文件
+// 
 //Error Code
 //成功
 const unsigned int SUCCESS = 0x0000;

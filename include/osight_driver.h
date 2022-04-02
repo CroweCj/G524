@@ -1,9 +1,10 @@
-#pragma once
+#ifndef EXINOVA_G524_OSIGHT_DRIVER_H__
+#define EXINOVA_G524_OSIGHT_DRIVER__H__
+
 #include <WINSOCK2.H>
 #include <time.h>
 #include <string>
 #include "osight_def.h"
-
 class OsightRadarDriver
 {
 public:
@@ -80,3 +81,4 @@ private:
 
     int mTimeOut;
 };
+#endif // EXINOVA_G524_OSIGHT_DRIVER__H__

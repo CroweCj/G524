@@ -6,7 +6,7 @@
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <vtkRenderWindow.h>
-#include "ui_pcl_test.h"
+#include "ui_mainwindow.h"
 #include "osight_measure_thread.h"
 #include "cloud_data_process.h"
 
