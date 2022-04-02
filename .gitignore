@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+\.[Vv]s/
+
+#vs .filters .user
+.filters 
+.user
