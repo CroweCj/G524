@@ -9,17 +9,20 @@ OsightMeasureTread::OsightMeasureTread(QObject* parent)
     ,mLocalPort(6000)
 {
     mCloud.reset(new PointCloudT);
-
-    mpRadarDriver = new OsightRadarDriver();
 }
 
 OsightMeasureTread::~OsightMeasureTread()
 {
-    mpRadarDriver->stopMeasure();
-    mpRadarDriver->disconnect();
-    if (mpRadarDriver != NULL)
-        delete mpRadarDriver;
+    mpRadarDevice->stopMeasure();
+    mpRadarDevice->close();
+    if (mpRadarDevice != NULL)
+        delete mpRadarDevice;
 
+}
+
+void OsightMeasureTread::setDevice(OsightDevice::RadarNumber type)
+{
+    mpRadarDevice = new OsightDevice(type);
 }
 
 void OsightMeasureTread::setRadarAddr(const QString& addr, short port)
@@ -41,22 +44,17 @@ void OsightMeasureTread::stop()
 
 void OsightMeasureTread::setRadarSpeed(unsigned char speed)
 {
-    if (speed < 5)
-        mRadarSpeed = 5;
-    else if (speed > 30)
-        mRadarSpeed = 30;
-    else
-        mRadarSpeed = speed;
+    mpRadarDevice->setRadarSpeed(speed);
 }
 void OsightMeasureTread::setRadarIntensity(unsigned char intensity)
 {
-    mIntensity = intensity;
+    mpRadarDevice->setRadarIntensity(intensity);
 }
 
 void OsightMeasureTread::setRadarAngleRes(double angleRes)
 {
-    //界面值*10^7
-    mAngleRes = angleRes * pow(10, 7);
+    //此值为界面传入值，未放大
+    mpRadarDevice->setRadarAngleRes(angleRes);
 }
 
 PointCloudT::Ptr OsightMeasureTread::getCloud()
@@ -69,26 +67,27 @@ void OsightMeasureTread::run()
     mIsRun = true;
 
     //TODO:配置雷达和本机地址
-    if (mpRadarDriver->connect(mRadarAddr.toStdString().c_str(),
+    if (mpRadarDevice->open(mRadarAddr.toStdString().c_str(),
         mRadarPort,
         mLocalAddr.toStdString().c_str(),
-        mLocalPort))
+        mLocalPort,
+        3000))
     {
         //TODO:参数配置
-        mpRadarDriver->paramConfigRsp(mRadarSpeed, mIntensity, mAngleRes);
+        mpRadarDevice->setParams();
         //获取数据点数
-        int pointNum = mpRadarDriver->paramSyncRsp();
+        int pointNum = mpRadarDevice->getPointNum();
         if (pointNum > 0)
         {
             //申请内存
             LidarData* pData = new LidarData[pointNum];
             //开始采集
-            mpRadarDriver->startMeasure();
+            mpRadarDevice->startMeasure();
             while (mIsRun)
             {
-                if (mpRadarDriver->recvOneFrameData(pData))
+                if (mpRadarDevice->getOneFrameData(pData))
                 {
-                    processMeasureData(pData, pointNum);
+                    lidarDataToCloud(pData, pointNum);
                 }
                 else
                 {
@@ -104,7 +103,7 @@ void OsightMeasureTread::run()
                         }
                         else
                         {
-                            pointNum = mpRadarDriver->paramSyncRsp();
+                            pointNum = mpRadarDevice->getPointNum();
                             if (pointNum > 0)
                             {
                                 mIsRun = true;
@@ -114,7 +113,7 @@ void OsightMeasureTread::run()
                                 //重新申请缓存区数据
                                 pData = new LidarData[pointNum];
                                 //重新启动测量
-                                mpRadarDriver->startMeasure();
+                                mpRadarDevice->startMeasure();
                                 break;
                             }
                         }
@@ -132,25 +131,23 @@ void OsightMeasureTread::run()
 }
 
 
-void OsightMeasureTread::processMeasureData(LidarData* pData, int pointNum)
+void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
 {
-    //TODO:cloud清空上一组数据
+    QMutexLocker locker(&mMutex);
     mCloud->clear();
     PointT poi;
     for (int i = 0; i < pointNum; ++i)
     {
-        //TODO:test
         //计算x，y，z 无垂直角度
-        poi.x = pData[i].distance * cos(pData[i].angle);
-        poi.y = pData[i].distance * sin(pData[i].angle);
+        poi.x = pData[i].distance * cosf(pData[i].angle * M_PI / 180);
+        poi.y = pData[i].distance * sinf(pData[i].angle * M_PI / 180);
         poi.z = 0;
+        poi.r = 255;
+        poi.g = 255;
+        poi.b = 255;
+        poi.a = 255;
         mCloud->push_back(poi);
     }
-    for (PointCloudT::iterator cloud_it = mCloud->begin(); cloud_it != mCloud->end(); ++cloud_it)
-    {
-        cloud_it->r = 248;
-        cloud_it->g = 248;
-        cloud_it->b = 255;
-    }
+
     emit sigCloudPointUpdated();
 }

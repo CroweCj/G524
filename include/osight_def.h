@@ -106,9 +106,14 @@ const unsigned short CONFIG_SPEED_INVALID = 0x0102;
 
 const unsigned short CONFIG_INTENSITY_INVALID = 0x0103;
 
+const unsigned char RADAR_SPEED_MIN = 5;
+
+const unsigned char RADAR_SPEED_MAX = 30;
+
 typedef struct LidarData
 {
     float  angle;//Ω«∂»
     float  distance;//æ‡¿Î
     unsigned short intensity;//«ø∂»
 }LidarData;
+

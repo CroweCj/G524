@@ -1,6 +1,12 @@
 #ifndef OSIGHT_RADAR_PCL_MAINWINDOW_H__
 #define OSIGHT_RADAR_PCL_MAINWINDOW__H__
-
+/*****************************************************************************
+* @FileName:mainwindow.h
+* @Author: chujiajun
+* @CreatTime: 2022/4/6
+* @Descriptions:主界面
+* @Version: ver 1.0
+*****************************************************************************/
 #include <QtWidgets/QMainWindow>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -9,6 +15,22 @@
 #include "ui_mainwindow.h"
 #include "osight_measure_thread.h"
 #include "cloud_data_process.h"
+typedef enum FunctionWidgetIndex
+{
+    RADAR_SETTING = 0,      //雷达设置
+    VEHICLE_SHOW,           //车辆轮廓
+    FUNC_END
+}FunctionWidgetIndex;
+
+typedef enum RadarType
+{
+    RADAR_A = 0,
+    RADAR_B,
+    RADAR_C,
+    RADAR_D,
+    RADAR_E,
+    INDEX_END
+}RadarType;
 
 class MainWindow : public QMainWindow
 {
@@ -21,27 +43,26 @@ public:
 
     void init();
 
-    void setBackgroundColor(double r, double g, double b);
+    //设置背景色
+    void setBackgroundColor(pcl::visualization::PCLVisualizer::Ptr viewer,
+        double r,
+        double g,
+        double b);
 
 private:
-    void initSetAngleRes();
-
-    void initSetIntensity();
-
-    void initSetSpeed();
+    //初始化vtk控件
+    void initVtkWidget();
+    //初始化界面控件
+    void initUi();
+    //初始化信号连接
+    void initConnect();
 
 private:
-    Ui::QtPCLTestClass ui;
-
-    pcl::visualization::PCLVisualizer::Ptr viewer;
-
-    //TODO:目前控制两个雷达 先这么做 
-    OsightMeasureTread* mpThreadOne;
-
-    OsightMeasureTread* mpThreadTwo;
-    //处理点云数据
-    SingleRadarProcess* mpSingleRadarProcess;
-    
+    Ui::mainwindow ui;
+    //雷达ABCDE对应Visualizer
+    pcl::visualization::PCLVisualizer::Ptr viewerA, viewerB, viewerC, viewerD, viewerE;
+    //用于车辆轮廓点云显示
+    pcl::visualization::PCLVisualizer::Ptr viewerShow;
 };
 
 #endif // OSIGHT_RADAR_PCL_MAINWINDOW__H__

@@ -47,15 +47,14 @@ public:
     void updateXYZ(ExinovaCloudData& data);
 
     double getSpeed(int id);
+
+    void detectorOutliers(int num, ExinovaCloudData& data);
 private:
     void init();
     //TODO:测速算法
     double countSpeed(int radarId, ExinovaCloudData& data, bool isReverse);
-    //TODO:轮廓算法
+
     bool coordinataTrans(int radarId, ExinovaCloudData& data);
-
-    void detectorOutliers(int num, ExinovaCloudData& data);
-
 private:
     //雷达数量
     int mRadarNums;

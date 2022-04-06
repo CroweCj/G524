@@ -1,9 +1,16 @@
 #ifndef EXINOVA_G524_OSIGHT_MEASURE_THREAD_H__
 #define EXINOVA_G524_OSIGHT_MEASURE_THREAD__H__
-
+/*****************************************************************************
+* @FileName:osight_measure_thread.h
+* @Author: chujiajun
+* @CreatTime: 2022/4/6
+* @Descriptions:数据采集线程
+* @Version: ver 1.0
+*****************************************************************************/
 #include <QThread>
 #include <QMetaType>
-#include "osight_driver.h"
+#include <QMutex>
+#include "osight_device.h"
 #include "param_def.h"
 class OsightMeasureTread : public QThread
 {
@@ -14,18 +21,18 @@ public:
 
     ~OsightMeasureTread();
 
+    void setDevice(OsightDevice::RadarNumber type);
+
     void setRadarAddr(const QString& addr, short port);
 
     void setLocalAddr(const QString& addr, short port);
 
     void stop();
-
-    //speed范围5-30
+    //设置转速
+    //范围5-30
     void setRadarSpeed(unsigned char speed);
-
     //设置雷达强度
     void setRadarIntensity(unsigned char intensity);
-
     //设置角分辨率
     void setRadarAngleRes(double angleResUi);
 
@@ -35,7 +42,7 @@ protected:
     void run();
 
 private:
-    void processMeasureData(LidarData* pData, int pointNum);
+    void lidarDataToCloud(LidarData* pData, int pointNum);
 
 signals:
     void sigRadarConnectFailed();
@@ -45,8 +52,8 @@ signals:
     void sigCloudPointUpdated();
 
 private:
-    //
-    OsightRadarDriver* mpRadarDriver;
+    //设备
+    OsightDevice* mpRadarDevice;
     //是否运行
     bool mIsRun;
     //雷达地址
@@ -57,16 +64,9 @@ private:
     QString mLocalAddr;
     //主机端口号
     short mLocalPort;
-
+    //点云数据
     PointCloudT::Ptr mCloud;
-
-    //雷达转速
-    unsigned char mRadarSpeed;
-
-    //强度
-    unsigned char mIntensity;
-
-    //角分辨率
-    unsigned int mAngleRes;
+    //锁
+    QMutex mMutex;
 };
 #endif // EXINOVA_G524_OSIGHT_MEASURE_THREAD__H__
