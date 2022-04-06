@@ -5,10 +5,6 @@
 #include <QMetaType>
 #include "osight_driver.h"
 #include "param_def.h"
-
-//зЂВс
-Q_DECLARE_METATYPE(PointCloudT::Ptr);
-
 class OsightMeasureTread : public QThread
 {
     Q_OBJECT

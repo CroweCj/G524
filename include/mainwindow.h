@@ -10,14 +10,14 @@
 #include "osight_measure_thread.h"
 #include "cloud_data_process.h"
 
-class PclMainWindow : public QMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    PclMainWindow(QWidget* parent = Q_NULLPTR);
+    MainWindow(QWidget* parent = Q_NULLPTR);
 
-    ~PclMainWindow();
+    ~MainWindow();
 
     void init();
 

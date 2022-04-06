@@ -55,7 +55,7 @@ private:
     bool coordinataTrans(int radarId, ExinovaCloudData& data);
 
     void detectorOutliers(int num, ExinovaCloudData& data);
-
+    
 private:
     //À×´ïÊıÁ¿
     int mRadarNums;

@@ -1,12 +1,12 @@
-ï»¿#include "cloud_data_process.h"
+#include "cloud_data_process.h"
 #include <QMutexLocker>
 #include <QPair>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 
-//TODO:ç›®å‰ä¸çŸ¥é“æ­¤å‚æ•°å…·ä½“ç”¨æ„
+//TODO:Ä¿Ç°²»ÖªµÀ´Ë²ÎÊı¾ßÌåÓÃÒâ
 const int POINTS_MIN_SIZE = 100;
-//TODO:ç»éªŒå€¼ï¼Ÿ
+//TODO:¾­ÑéÖµ£¿
 const double MIN_SPEED = 5.311;
 
 SingleRadarProcess::SingleRadarProcess()
@@ -117,7 +117,7 @@ void SingleRadarProcess::init()
 
 double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool isReverse)
 {
-    //å†å²æ•°æ®
+    //ÀúÊ·Êı¾İ
     std::map<int, std::vector<std::vector<OBJ>>>::iterator iter;
     iter = mHistoryFramesObs.find(radarId);
     if (iter == mHistoryFramesObs.end())
@@ -130,7 +130,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
 
     int obStartIndex = 0;
     int obEndIndex = 0;
-    //å½“å‰å¸§ç›®æ ‡ç»Ÿè®¡
+    //µ±Ç°Ö¡Ä¿±êÍ³¼Æ
     std::vector<OBJ> currentFrameObs;
     for (int i = 1; i < cloudData->size(); ++i)
     {
@@ -149,7 +149,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
         }
     }
 
-    //å¦‚æœå½“å‰å¸§æ²¡æœ‰ç›®æ ‡ï¼Œåˆ™åˆ·æ–°å†å²æ•°æ®ï¼Œå¹¶è¿”å›0
+    //Èç¹ûµ±Ç°Ö¡Ã»ÓĞÄ¿±ê£¬ÔòË¢ĞÂÀúÊ·Êı¾İ£¬²¢·µ»Ø0
     if (currentFrameObs.empty())
     {
         if (iter->second.size() < 10)
@@ -164,7 +164,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
         return 0;
     }
 
-    //é€‰å–ä¸­é—´ç›®æ ‡ä½œä¸ºè·Ÿè¸ªç›®æ ‡
+    //Ñ¡È¡ÖĞ¼äÄ¿±ê×÷Îª¸ú×ÙÄ¿±ê
     OBJ trackedOb;
     int obIndex = -1;
     double minDis = -100;
@@ -188,7 +188,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
             }
         }
     }
-    //å¦‚æœæ‰¾åˆ°å¯è¿½è¸ªå¯¹è±¡ï¼Œåˆ™ç¡®è®¤è¿½è¸ªå¯¹è±¡ï¼Œå¦åˆ™æ›´æ–°å†å²æ•°æ®å¹¶è¿”å›0
+    //Èç¹ûÕÒµ½¿É×·×Ù¶ÔÏó£¬ÔòÈ·ÈÏ×·×Ù¶ÔÏó£¬·ñÔò¸üĞÂÀúÊ·Êı¾İ²¢·µ»Ø0
     if (obIndex != -1)
     {
         trackedOb = currentFrameObs[obIndex];
@@ -207,7 +207,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
 
         return 0;
     }
-    //è¿½æº¯å†å²å¸§ç›®æ ‡
+    //×·ËİÀúÊ·Ö¡Ä¿±ê
     std::vector<OBJ> trackedOBs;
     trackedOBs.push_back(trackedOb);
     OBJ tmpOb = trackedOb;
@@ -238,7 +238,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
         }
     }
 
-    //è®¡ç®—å¹³å‡é€Ÿåº¦
+    //¼ÆËãÆ½¾ùËÙ¶È
     double endPointSpeed = 0;
     double startPointSpeed = 0;
     for (int i = 0; i < trackedOBs.size() - 1; ++i)
@@ -250,7 +250,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
     endPointSpeed = endPointSpeed / (trackedOBs.size() - 1);
     double averageSpeed = (startPointSpeed + endPointSpeed) / 2;
 
-    //æ›´æ–°å†å²æ•°æ®
+    //¸üĞÂÀúÊ·Êı¾İ
     if (iter->second.size() < 10)
     {
         iter->second.push_back(currentFrameObs);

@@ -5,9 +5,15 @@ ExinovaCloudData::ExinovaCloudData()
 {
     mCloud = PointCloudT::Ptr(new PointCloudT);
 }
+
 ExinovaCloudData::ExinovaCloudData(PointCloudT::Ptr cloud)
     :mCloud(cloud)
 {
+}
+
+ExinovaCloudData::ExinovaCloudData(const ExinovaCloudData& data)
+{
+    mCloud = data.data();
 }
 
 ExinovaCloudData::~ExinovaCloudData()
@@ -19,7 +25,8 @@ ExinovaCloudData ExinovaCloudData::operator+(ExinovaCloudData& data)
     QMutexLocker locker(&mMutex);
     PointCloudT::Ptr result(new PointCloudT);
     *result = (*mCloud) + (*data.data());
-    return ExinovaCloudData(result);
+    ExinovaCloudData res(result);
+    return res;
 }
 
 ExinovaCloudData& ExinovaCloudData::operator+=(ExinovaCloudData& data)
@@ -36,7 +43,7 @@ ExinovaCloudData& ExinovaCloudData::operator+=(PointCloudT& data)
     return *this;
 }
 
-ExinovaCloudData& ExinovaCloudData::operator=(const ExinovaCloudData& data)
+ExinovaCloudData& ExinovaCloudData::operator=(ExinovaCloudData& data)
 {
     QMutexLocker locker(&mMutex);
     mCloud = data.data();
@@ -60,7 +67,15 @@ PointCloudT::Ptr ExinovaCloudData::data()
     QMutexLocker locker(&mMutex);
     return mCloud;
 }
+PointCloudT::Ptr ExinovaCloudData::data() const
+{
+    return mCloud;
+}
 
+ExinovaCloudData& ExinovaCloudData::getThis()
+{
+    return *this;
+}
 
 
 

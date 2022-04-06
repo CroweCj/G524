@@ -14,6 +14,8 @@ public:
 
     ExinovaCloudData(PointCloudT::Ptr cloud);
 
+    ExinovaCloudData(const ExinovaCloudData& data);
+
     ~ExinovaCloudData();
 
     ExinovaCloudData operator+(ExinovaCloudData& data);
@@ -22,13 +24,17 @@ public:
 
     ExinovaCloudData& operator+=(PointCloudT& data);
 
-    ExinovaCloudData& operator=(const ExinovaCloudData& data);
+    ExinovaCloudData& operator=(ExinovaCloudData& data);
 
     void setData(PointCloudT::Ptr cloud);
 
     void clearData();
 
     PointCloudT::Ptr data();
+
+    PointCloudT::Ptr data() const;
+
+    ExinovaCloudData& getThis();
 
 private:
     PointCloudT::Ptr mCloud;
