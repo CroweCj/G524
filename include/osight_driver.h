@@ -1,6 +1,12 @@
 #ifndef EXINOVA_G524_OSIGHT_DRIVER_H__
 #define EXINOVA_G524_OSIGHT_DRIVER__H__
-
+/*****************************************************************************
+* @FileName:osight_driver.h
+* @Author: chujiajun
+* @CreatTime: 2022/4/2
+* @Descriptions:osight数据获取
+* @Version: ver 1.0
+*****************************************************************************/
 #include <WINSOCK2.H>
 #include <time.h>
 #include <string>
@@ -11,31 +17,31 @@ public:
     OsightRadarDriver();
 
     ~OsightRadarDriver();
-
+    //连接设备
     bool connect(const char* radarIp = "192.168.1.10",
         const unsigned short radarPort = 6500,
         const char* localIp = "192.168.1.88",
         const unsigned short localPort = 5500);
-
+    //关闭设备
     void disconnect();
-
+    //开始测量
     bool startMeasure();
-
+    //停止测量
     bool stopMeasure();
 
     bool paramSyncReq();
 
     //返回数据点数
     int paramSyncRsp();
-
+    //设置参数请求
     bool paramConfigReq(unsigned char spped,
         unsigned char intensity,
         unsigned int angleRes);
-
+    //设置参数回应（设置参数接口）
     int paramConfigRsp(unsigned char spped,
         unsigned char intensity,
         unsigned int angleRes);
-
+    //获取一帧数据
     bool recvOneFrameData(LidarData* data);
 
 public:

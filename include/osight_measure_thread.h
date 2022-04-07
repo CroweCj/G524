@@ -23,6 +23,8 @@ public:
 
     void setDevice(OsightDevice::RadarNumber type);
 
+    OsightDevice* getDevice() { return mpRadarDevice; }
+
     void setRadarAddr(const QString& addr, short port);
 
     void setLocalAddr(const QString& addr, short port);

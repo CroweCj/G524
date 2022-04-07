@@ -99,18 +99,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\cloud_data_process.h" />
+    <ClInclude Include="include\config_setting.h" />
     <ClInclude Include="include\exinova_point_cloud_data.h" />
     <ClInclude Include="include\osight_def.h" />
-    <ClInclude Include="include\osight_device.h" />
+    <QtMoc Include="include\osight_device.h" />
     <ClInclude Include="include\osight_driver.h" />
     <ClInclude Include="include\param_def.h" />
-    <ClInclude Include="include\radar_manager.h" />
+    <QtMoc Include="include\radar_manager.h" />
     <QtMoc Include="include\mainwindow.h" />
     <QtMoc Include="include\osight_measure_thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\cloud_data_process.cpp" />
+    <ClCompile Include="src\config_setting.cpp" />
     <ClCompile Include="src\exinova_point_cloud_data.cpp" />
     <ClCompile Include="src\osight_device.cpp" />
     <ClCompile Include="src\osight_driver.cpp" />

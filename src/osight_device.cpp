@@ -65,6 +65,17 @@ int OsightDevice::getPointNum()
     return mpDriver->paramSyncRsp();
 }
 
+void OsightDevice::setEnable(bool enable)
+{
+    QMutexLocker locker(&mMutex);
+    mEnable = enable;
+}
+
+bool OsightDevice::getEnable()
+{
+    return mEnable;
+}
+
 QString OsightDevice::getIp()
 {
     return mIp;

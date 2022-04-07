@@ -7,6 +7,7 @@
 * @Descriptions:封装雷达设备：数据获取，参数设置等
 * @Version: ver 1.0
 *****************************************************************************/
+#include <QObject>
 #include <QString>
 #include <QMutex>
 #include "osight_driver.h"
@@ -22,8 +23,9 @@ typedef struct FilterSetting
 }FilterSetting;
 
 
-class OsightDevice
+class OsightDevice : public QObject
 {
+    Q_OBJECT
 public:
     //设备类型
     enum RadarNumber
@@ -56,6 +58,10 @@ public:
     bool getOneFrameData(LidarData* data);
     //获取点数
     int getPointNum();
+
+    void setEnable(bool enable);
+
+    bool getEnable();
 
     QString getIp();
 

@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget_radar_setting">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -77,7 +77,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymin_a">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymin_a">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -100,7 +100,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymax_a">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymax_a">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -134,7 +134,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmin_a">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmin_a">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -157,7 +157,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmax_a">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmax_a">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -222,7 +222,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmin_b">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmin_b">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -245,7 +245,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmax_b">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmax_b">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -292,7 +292,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymin_b">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymin_b">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -315,7 +315,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymax_b">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymax_b">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -387,7 +387,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmin_c">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmin_c">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -410,7 +410,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmax_c">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmax_c">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -447,7 +447,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymin_c">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymin_c">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -470,7 +470,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymax_c">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymax_c">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -562,7 +562,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmin_d">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmin_d">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -585,7 +585,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmax_d">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmax_d">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -612,7 +612,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymin_d">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymin_d">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -635,7 +635,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymax_d">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymax_d">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -735,7 +735,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymin_e">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymin_e">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -758,7 +758,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_ymax_e">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_ymax_e">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -812,7 +812,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmin_e">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmin_e">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -835,7 +835,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_xmax_e">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_xmax_e">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -872,7 +872,7 @@
         <item row="0" column="1">
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="Radar_A">
            <attribute name="title">

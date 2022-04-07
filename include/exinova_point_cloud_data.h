@@ -1,5 +1,12 @@
 #ifndef EXINOVA_G524_EXINOVA_POINT_CLOUD_DATA_H__
 #define EXINOVA_G524_EXINOVA_POINT_CLOUD_DATA__H__
+/*****************************************************************************
+* @FileName:exinova_point_cloud_data.h
+* @Author: chujiajun
+* @CreatTime: 2022/4/5
+* @Descriptions:·â×°cloudÊý¾Ý
+* @Version: ver 1.0
+*****************************************************************************/
 #include <QMutex>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
