@@ -12,6 +12,8 @@
 #include <QString>
 #include "osight_measure_thread.h"
 
+class SingleRadarProcess;
+
 class RadarManager : public QObject
 {
     Q_OBJECT
@@ -60,5 +62,7 @@ private:
 private:
     //存储设备信息
     QMap<QString, OsightMeasureTread*> mDeviceMap;
+    //数据处理类
+    SingleRadarProcess* mpDataProcess;
 };
 #endif // EXINOVA_G524_RADAR_MANAGER__H__

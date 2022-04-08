@@ -35,7 +35,7 @@ typedef struct DetectOutlineData
 class SingleRadarProcess
 {
 public:
-    SingleRadarProcess();
+    SingleRadarProcess(int nums = 0);
 
     ~SingleRadarProcess();
 

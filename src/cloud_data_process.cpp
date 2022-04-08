@@ -9,8 +9,8 @@ const int POINTS_MIN_SIZE = 100;
 //TODO:经验值？
 const double MIN_SPEED = 5.311;
 
-SingleRadarProcess::SingleRadarProcess()
-    :mRadarNums(0)
+SingleRadarProcess::SingleRadarProcess(int nums)
+    :mRadarNums(nums)
 {
     mHistoryFramesObs.clear();
 

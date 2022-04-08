@@ -1,5 +1,5 @@
 #include "radar_manager.h"
-
+#include "cloud_data_process.h"
 RadarManager::RadarManager()
 {
 
@@ -19,6 +19,7 @@ RadarManager::~RadarManager()
 void RadarManager::init()
 {
     //TODO:´ıÍê³É
+    mpDataProcess = new SingleRadarProcess(5);
 }
 
 bool RadarManager::addDevice(const QString& ip, int type)
