@@ -29,6 +29,8 @@
 *.log
 *.pdb
 *.ilk
+*.recipe
+x64/[Dd]ebug/*.txt
 
 # Executables
 *.exe
