@@ -25,6 +25,10 @@
 *.la
 *.a
 *.lib
+#log
+*.log
+*.pdb
+*.ilk
 
 # Executables
 *.exe
@@ -39,6 +43,10 @@ build/
 [Bb]in/
 [Oo]bj/
 \.[Vv]s/
+[Uu]ic/
+[Mm]oc/
+[Qq]make/
+Exinova_G524.tlog/
 
 #vs .filters .user
 *.filters 

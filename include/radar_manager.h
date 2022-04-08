@@ -23,7 +23,7 @@ public:
     //初始化
     void init();
     //添加设备
-    void addDevice(const QString& ip, int type);
+    bool addDevice(const QString& ip, int type);
     //判断设备是否存在
     bool isDevExist(const QString& ip);
     //移除设备
@@ -40,10 +40,18 @@ public:
     void setRadaryMin(const QString& ip, double val);
     //设置ymax
     void setRadaryMax(const QString& ip, double val);
+    //设置xmin,xmax,ymin,ymax
+    void setRadarThd(const QString& ip,
+        double xmin,
+        double xmax, 
+        double ymin, 
+        double ymax);
+    //获取cloud
+    PointCloudT::Ptr getCloud(const QString& ip);
 signals:
-    void sigThreadCloudUpdated();
+    void sigThreadCloudUpdated(const QString& ip);
 public slots:
-    void threadCloudUpdate();
+    void threadCloudUpdate(const QString& ip);
 private:
     //初始化信号与槽
     void initConnect();

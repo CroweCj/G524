@@ -98,7 +98,7 @@ void OsightMeasureTread::run()
                         if (((double)(clock() - startTime) / CLOCKS_PER_SEC) >= 1800)
                         {
                             mIsRun = false;
-                            emit sigRadarConnectFailed();
+                            emit sigRadarConnectFailed(mpRadarDevice->getIp());
                             return;
                         }
                         else
@@ -125,7 +125,7 @@ void OsightMeasureTread::run()
     }
     else
     {
-        emit sigRadarConnectFailed();
+        emit sigRadarConnectFailed(mpRadarDevice->getIp());
         return;
     }
 }
@@ -149,5 +149,5 @@ void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
         mCloud->push_back(poi);
     }
 
-    emit sigCloudPointUpdated();
+    emit sigCloudPointUpdated(mpRadarDevice->getIp());
 }

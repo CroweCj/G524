@@ -93,6 +93,12 @@ private:
     void initUi();
     //初始化信号连接
     void initConnect();
+    //更新ini文件
+    void updateSettings();
+
+    void updateShow(pcl::visualization::PCLVisualizer::Ptr viewer,
+        const QString& ip,
+        const QString& cloudId);
 private:
     Ui::mainwindow ui;
     //雷达ABCDE对应Visualizer

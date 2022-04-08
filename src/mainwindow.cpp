@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget* parent)
 }
 MainWindow::~MainWindow()
 {
+    updateSettings();
     delete mpRadarManager;
 }
 
@@ -49,6 +50,8 @@ void MainWindow::init()
     //ui.lineEdit_local_port2->setText("5500");
     //ui.lineEdit__radar_ip1->setText("192.168.1.10");
     //ui.lineEdit__radar_port1->setText("6500");
+    
+    mpRadarManager = new RadarManager();
 
     initVtkWidget();
 
@@ -65,166 +68,247 @@ void MainWindow::setBackgroundColor(pcl::visualization::PCLVisualizer::Ptr viewe
 void MainWindow::radarAConnect()
 {
     //TODO:
+    QString ip = ui.lineEdit_ip_a->text();
+    mpRadarManager->setRadarThd(ip,
+        ui.doubleSpinBox_xmin_a->value(),
+        ui.doubleSpinBox_xmax_a->value(),
+        ui.doubleSpinBox_ymin_a->value(),
+        ui.doubleSpinBox_ymax_a->value());
+    mpRadarManager->connect(ip, OsightDevice::RADAR_A);
 }
 
 void MainWindow::radarADisconnect()
 {
     //TODO:
+    mpRadarManager->disconnect(ui.lineEdit_ip_a->text());
 }
 
 void MainWindow::radarAXMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMin(ui.lineEdit_ip_a->text(),
+        ui.doubleSpinBox_xmin_a->value());
 }
 
 void MainWindow::radarAXMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMax(ui.lineEdit_ip_a->text(),
+        ui.doubleSpinBox_xmax_a->value());
 }
 
 void MainWindow::radarAYMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMin(ui.lineEdit_ip_a->text(),
+        ui.doubleSpinBox_ymin_a->value());
 }
 
 void MainWindow::radarAYMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMax(ui.lineEdit_ip_a->text(),
+        ui.doubleSpinBox_ymax_a->value());
 }
 
 void MainWindow::radarBConnect()
 {
     //TODO:
+    QString ip = ui.lineEdit_ip_b->text();
+    mpRadarManager->setRadarThd(ip,
+        ui.doubleSpinBox_xmin_b->value(),
+        ui.doubleSpinBox_xmax_b->value(),
+        ui.doubleSpinBox_ymin_b->value(),
+        ui.doubleSpinBox_ymax_b->value());
+    mpRadarManager->connect(ip, OsightDevice::RADAR_B);
 }
 
 void MainWindow::radarBDisconnect()
 {
     //TODO:
+    mpRadarManager->disconnect(ui.lineEdit_ip_b->text());
 }
 
 void MainWindow::radarBXMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMin(ui.lineEdit_ip_b->text(),
+        ui.doubleSpinBox_xmin_b->value());
 }
 
 void MainWindow::radarBXMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMax(ui.lineEdit_ip_b->text(),
+        ui.doubleSpinBox_xmax_b->value());
 }
 
 void MainWindow::radarBYMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMin(ui.lineEdit_ip_b->text(),
+        ui.doubleSpinBox_ymin_b->value());
 }
 
 void MainWindow::radarBYMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMax(ui.lineEdit_ip_b->text(),
+        ui.doubleSpinBox_ymax_b->value());
 }
 
 void MainWindow::radarCConnect()
 {
     //TODO:
+    QString ip = ui.lineEdit_ip_c->text();
+    mpRadarManager->setRadarThd(ip,
+        ui.doubleSpinBox_xmin_c->value(),
+        ui.doubleSpinBox_xmax_c->value(),
+        ui.doubleSpinBox_ymin_c->value(),
+        ui.doubleSpinBox_ymax_c->value());
+    mpRadarManager->connect(ip, OsightDevice::RADAR_C);
 }
 
 void MainWindow::radarCDisconnect()
 {
     //TODO:
+    mpRadarManager->disconnect(ui.lineEdit_ip_c->text());
 }
 
 void MainWindow::radarCXMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMin(ui.lineEdit_ip_c->text(),
+        ui.doubleSpinBox_xmin_c->value());
 }
 
 void MainWindow::radarCXMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMax(ui.lineEdit_ip_c->text(),
+        ui.doubleSpinBox_xmax_c->value());
 }
 
 void MainWindow::radarCYMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMin(ui.lineEdit_ip_c->text(),
+        ui.doubleSpinBox_ymin_c->value());
 }
 
 void MainWindow::radarCYMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMax(ui.lineEdit_ip_c->text(),
+        ui.doubleSpinBox_ymax_c->value());
 }
 
 void MainWindow::radarDConnect()
 {
     //TODO:
+    QString ip = ui.lineEdit_ip_d->text();
+    mpRadarManager->setRadarThd(ip,
+        ui.doubleSpinBox_xmin_d->value(),
+        ui.doubleSpinBox_xmax_d->value(),
+        ui.doubleSpinBox_ymin_d->value(),
+        ui.doubleSpinBox_ymax_d->value());
+    mpRadarManager->connect(ip, OsightDevice::RADAR_D);
 }
 
 void MainWindow::radarDDisconnect()
 {
     //TODO:
+    mpRadarManager->disconnect(ui.lineEdit_ip_d->text());
 }
 
 void MainWindow::radarDXMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMin(ui.lineEdit_ip_d->text(),
+        ui.doubleSpinBox_xmin_d->value());
 }
 
 void MainWindow::radarDXMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMax(ui.lineEdit_ip_d->text(),
+        ui.doubleSpinBox_xmax_d->value());
 }
 
 void MainWindow::radarDYMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMin(ui.lineEdit_ip_d->text(),
+        ui.doubleSpinBox_ymin_d->value());
 }
 
 void MainWindow::radarDYMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMax(ui.lineEdit_ip_d->text(),
+        ui.doubleSpinBox_ymax_d->value());
 }
 
 void MainWindow::radarEConnect()
 {
     //TODO:
+    QString ip = ui.lineEdit_ip_e->text();
+    mpRadarManager->setRadarThd(ip,
+        ui.doubleSpinBox_xmin_e->value(),
+        ui.doubleSpinBox_xmax_e->value(),
+        ui.doubleSpinBox_ymin_e->value(),
+        ui.doubleSpinBox_ymax_e->value());
+    mpRadarManager->connect(ip, OsightDevice::RADAR_C);
 }
 
 void MainWindow::radarEDisconnect()
 {
     //TODO:
+    mpRadarManager->disconnect(ui.lineEdit_ip_e->text());
 }
 
 void MainWindow::radarEXMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMin(ui.lineEdit_ip_e->text(),
+        ui.doubleSpinBox_xmin_e->value());
 }
 
 void MainWindow::radarEXMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadarxMax(ui.lineEdit_ip_e->text(),
+        ui.doubleSpinBox_xmax_e->value());
 }
 
 void MainWindow::radarEYMinChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMin(ui.lineEdit_ip_e->text(),
+        ui.doubleSpinBox_ymin_e->value());
 }
 
 void MainWindow::radarEYMaxChange(double value)
 {
     //TODO:
+    mpRadarManager->setRadaryMax(ui.lineEdit_ip_e->text(),
+        ui.doubleSpinBox_ymax_e->value());
 }
 
 void MainWindow::initVtkWidget()
 {
-    viewerA.reset(new pcl::visualization::PCLVisualizer("viewerA"));
+    viewerA.reset(new pcl::visualization::PCLVisualizer("viewerA",false));
     viewerA->addCoordinateSystem();
-    viewerB.reset(new pcl::visualization::PCLVisualizer("viewerB"));
+    viewerA->setupInteractor(ui.qvtkWidget_A->GetInteractor(), ui.qvtkWidget_A->GetRenderWindow());
+    viewerB.reset(new pcl::visualization::PCLVisualizer("viewerB", false));
     viewerB->addCoordinateSystem();
-    viewerC.reset(new pcl::visualization::PCLVisualizer("viewerC"));
+    viewerC.reset(new pcl::visualization::PCLVisualizer("viewerC", false));
     viewerC->addCoordinateSystem();
-    viewerD.reset(new pcl::visualization::PCLVisualizer("viewerD"));
+    viewerD.reset(new pcl::visualization::PCLVisualizer("viewerD", false));
     viewerD->addCoordinateSystem();
-    viewerE.reset(new pcl::visualization::PCLVisualizer("viewerE"));
+    viewerE.reset(new pcl::visualization::PCLVisualizer("viewerE", false));
     viewerE->addCoordinateSystem();
-    viewerShow.reset(new pcl::visualization::PCLVisualizer("viewerShow"));
+    viewerShow.reset(new pcl::visualization::PCLVisualizer("viewerShow", false));
     viewerShow->addCoordinateSystem();
     ui.qvtkWidget_A->SetRenderWindow(viewerA->getRenderWindow());
     ui.qvtkWidget_B->SetRenderWindow(viewerB->getRenderWindow());
@@ -245,6 +329,11 @@ void MainWindow::initVtkWidget()
     ui.qvtkWidget_E->update();
     viewerShow->resetCamera();
     ui.qvtkWidget_show->update();
+
+    while (!viewerA->wasStopped())
+    {
+        viewerA->spinOnce();
+    }
 }
 
 void MainWindow::initUi()
@@ -254,7 +343,6 @@ void MainWindow::initUi()
     ui.tabWidget_radar_setting->setCurrentIndex(RADAR_SETTING);
     //显示雷达b
     ui.tabWidget_A->setCurrentIndex(RADAR_B);
-    ui.tabWidget->setCurrentIndex(RADAR_B);
     ////雷达端口默认6500
     //ui.spinBox_port_a->setValue(6500);
     //ui.spinBox_port_b->setValue(6500);
@@ -371,12 +459,87 @@ void MainWindow::initConnect()
     connect(ui.doubleSpinBox_ymax_e, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this, &MainWindow::radarEYMaxChange);
 
-    connect(ui.tabWidget_A, &QTabWidget::currentChanged, this, [=](int index) {
-        ui.tabWidget->setCurrentIndex(index);
+    connect(mpRadarManager, &RadarManager::sigThreadCloudUpdated, this, [=](const QString& ip) {
+        //若ip为雷达a地址 则对应显示cloud
+        if (ip == ui.lineEdit_ip_a->text())
+        {
+            updateShow(viewerA,ip,"radar_a");
+            ui.qvtkWidget_A->update();
+        }
+        else if (ip == ui.lineEdit_ip_b->text())
+        {
+            updateShow(viewerB, ip, "radar_b");
+            ui.qvtkWidget_B->update();
+        }
+        else if (ip == ui.lineEdit_ip_c->text())
+        {
+            updateShow(viewerC, ip, "radar_c");
+            ui.qvtkWidget_C->update();
+        }
+        else if (ip == ui.lineEdit_ip_c->text())
+        {
+            updateShow(viewerD, ip, "radar_d");
+            ui.qvtkWidget_D->update();
+        }
+        else if (ip == ui.lineEdit_ip_c->text())
+        {
+            updateShow(viewerE, ip, "radar_e");
+            ui.qvtkWidget_E->update();
+        }
+        else
+        {
+            //TODO:未做处理，为了保持条件结构完整
+        }
         });
-    connect(ui.tabWidget, &QTabWidget::currentChanged, this, [=](int index) {
-        ui.tabWidget_A->setCurrentIndex(index);
-        });
+}
+
+void MainWindow::updateSettings()
+{
+    ExinovaSettings::setValue("radar_a/ip", ui.lineEdit_ip_a->text());
+    ExinovaSettings::setValue("radar_a/port", ui.spinBox_port_a->value());
+    ExinovaSettings::setValue("radar_a/xmin", ui.doubleSpinBox_xmin_a->value());
+    ExinovaSettings::setValue("radar_a/xmax", ui.doubleSpinBox_xmax_a->value());
+    ExinovaSettings::setValue("radar_a/ymin", ui.doubleSpinBox_ymin_a->value());
+    ExinovaSettings::setValue("radar_a/ymax", ui.doubleSpinBox_ymax_a->value());
+
+    ExinovaSettings::setValue("radar_b/ip", ui.lineEdit_ip_b->text());
+    ExinovaSettings::setValue("radar_b/port", ui.spinBox_port_b->value());
+    ExinovaSettings::setValue("radar_b/xmin", ui.doubleSpinBox_xmin_b->value());
+    ExinovaSettings::setValue("radar_b/xmax", ui.doubleSpinBox_xmax_b->value());
+    ExinovaSettings::setValue("radar_b/ymin", ui.doubleSpinBox_ymin_b->value());
+    ExinovaSettings::setValue("radar_b/ymax", ui.doubleSpinBox_ymax_b->value());
+
+    ExinovaSettings::setValue("radar_c/ip", ui.lineEdit_ip_c->text());
+    ExinovaSettings::setValue("radar_c/port", ui.spinBox_port_c->value());
+    ExinovaSettings::setValue("radar_c/xmin", ui.doubleSpinBox_xmin_c->value());
+    ExinovaSettings::setValue("radar_c/xmax", ui.doubleSpinBox_xmax_c->value());
+    ExinovaSettings::setValue("radar_c/ymin", ui.doubleSpinBox_ymin_c->value());
+    ExinovaSettings::setValue("radar_c/ymax", ui.doubleSpinBox_ymax_c->value());
+
+    ExinovaSettings::setValue("radar_d/ip", ui.lineEdit_ip_d->text());
+    ExinovaSettings::setValue("radar_d/port", ui.spinBox_port_d->value());
+    ExinovaSettings::setValue("radar_d/xmin", ui.doubleSpinBox_xmin_d->value());
+    ExinovaSettings::setValue("radar_d/xmax", ui.doubleSpinBox_xmax_d->value());
+    ExinovaSettings::setValue("radar_d/ymin", ui.doubleSpinBox_ymin_d->value());
+    ExinovaSettings::setValue("radar_d/ymax", ui.doubleSpinBox_ymax_d->value());
+
+    ExinovaSettings::setValue("radar_e/ip", ui.lineEdit_ip_e->text());
+    ExinovaSettings::setValue("radar_e/port", ui.spinBox_port_e->value());
+    ExinovaSettings::setValue("radar_e/xmin", ui.doubleSpinBox_xmin_e->value());
+    ExinovaSettings::setValue("radar_e/xmax", ui.doubleSpinBox_xmax_e->value());
+    ExinovaSettings::setValue("radar_e/ymin", ui.doubleSpinBox_ymin_e->value());
+    ExinovaSettings::setValue("radar_e/ymax", ui.doubleSpinBox_ymax_e->value());
+}
+
+void MainWindow::updateShow(pcl::visualization::PCLVisualizer::Ptr viewer, const QString& ip, const QString& cloudId)
+{
+    PointCloudT::Ptr cloud = mpRadarManager->getCloud(ip);
+    std::string str = cloudId.toStdString();
+    viewer->removeAllPointClouds();
+    viewer->removeAllShapes();
+    viewer->addPointCloud(cloud, str);
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, str);
+    viewer->updatePointCloud(cloud, str);
 }
 
 

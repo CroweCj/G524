@@ -47,11 +47,11 @@ private:
     void lidarDataToCloud(LidarData* pData, int pointNum);
 
 signals:
-    void sigRadarConnectFailed();
+    void sigRadarConnectFailed(const QString& ip);
 
-    void sigRadarConnectSuccess();
+    void sigRadarConnectSuccess(const QString& ip);
 
-    void sigCloudPointUpdated();
+    void sigCloudPointUpdated(const QString& ip);
 
 private:
     //…Ë±∏

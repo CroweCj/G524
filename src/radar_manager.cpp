@@ -21,7 +21,7 @@ void RadarManager::init()
     //TODO:´ýÍê³É
 }
 
-void RadarManager::addDevice(const QString& ip, int type)
+bool RadarManager::addDevice(const QString& ip, int type)
 {
     if (!isDevExist(ip) && ipJudge(ip))
     {
@@ -31,6 +31,12 @@ void RadarManager::addDevice(const QString& ip, int type)
 
         QObject::connect(pThread, &OsightMeasureTread::sigCloudPointUpdated, 
             this, &RadarManager::threadCloudUpdate);
+
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -62,9 +68,13 @@ void RadarManager::connect(const QString& ip, int type)
     }
     else
     {
-        addDevice(ip, type);
-        mDeviceMap[ip]->getDevice()->setEnable(true);
-        mDeviceMap[ip]->start();
+        if (addDevice(ip, type))
+        {
+            mDeviceMap[ip]->getDevice()->setEnable(true);
+            mDeviceMap[ip]->start();
+        }
+        else
+            return;
     }
 }
 
@@ -114,9 +124,31 @@ void RadarManager::setRadaryMax(const QString& ip, double val)
     }
 }
 
-void RadarManager::threadCloudUpdate()
+void RadarManager::setRadarThd(const QString& ip,
+    double xmin,
+    double xmax,
+    double ymin,
+    double ymax)
 {
-    emit sigThreadCloudUpdated();
+    QMap<QString, OsightMeasureTread*>::iterator it = mDeviceMap.find(ip);
+    if (it != mDeviceMap.end())
+    {
+        OsightDevice* pDevice = it.value()->getDevice();
+        pDevice->setFilterXMin(xmin);
+        pDevice->setFilterXMax(xmax);
+        pDevice->setFilterYMin(ymin);
+        pDevice->setFilterYMax(ymax);
+    }
+}
+
+PointCloudT::Ptr RadarManager::getCloud(const QString& ip)
+{
+    return mDeviceMap[ip]->getCloud();
+}
+
+void RadarManager::threadCloudUpdate(const QString& ip)
+{
+    emit sigThreadCloudUpdated(ip);
 }
 
 bool RadarManager::ipJudge(const QString& ip)
