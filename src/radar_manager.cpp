@@ -2,7 +2,7 @@
 #include "cloud_data_process.h"
 RadarManager::RadarManager()
 {
-
+    init();
 }
 
 RadarManager::~RadarManager()
@@ -12,7 +12,7 @@ RadarManager::~RadarManager()
     {
         QObject::disconnect(it.value(), &OsightMeasureTread::sigCloudPointUpdated,
             this, &RadarManager::threadCloudUpdate);
-        delete it.value();
+        it.value()->deleteLater();
     }
 }
 
@@ -144,12 +144,77 @@ void RadarManager::setRadarThd(const QString& ip,
 
 PointCloudT::Ptr RadarManager::getCloud(const QString& ip)
 {
-    return mDeviceMap[ip]->getCloud();
+    return mDeviceMap[ip]->getCloud().data();
 }
 
 void RadarManager::threadCloudUpdate(const QString& ip)
 {
-    emit sigThreadCloudUpdated(ip);
+    OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
+    //switch (type)
+    //{
+    //case OsightDevice::RADAR_A:
+
+    //case OsightDevice::RADAR_B:
+    //    if (mpDataProcess->detectorSpeed(type, mDeviceMap[ip]->getCloud()) > 0)
+    //    {
+    //        emit sigBSpeedUpdated();
+    //    }
+    //    break;
+    //case OsightDevice::RADAR_C:
+    //    emit sigCSpeedUpdated();
+    //    break;
+    //case OsightDevice::RADAR_D:
+    //    emit sigDSpeedUpdated();
+    //    break;
+    //case OsightDevice::RADAR_E:
+
+    //default:
+    //    break;
+    //}
+
+    if (type == OsightDevice::RADAR_A)
+    {
+        emit sigAThreadCloudUpdated(ip);
+        if (mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
+        {
+            emit sigAOutlineUpdated(ip);
+        }
+    }
+    else if (type == OsightDevice::RADAR_B)
+    {
+        emit sigBThreadCloudUpdated(ip);
+        if (mpDataProcess->detectorSpeed(type, mDeviceMap[ip]->getCloud()) > 0)
+        {
+            emit sigBSpeedUpdated(ip);
+        }
+    }
+    else if (type == OsightDevice::RADAR_C)
+    {
+        emit sigCThreadCloudUpdated(ip);
+        if (mpDataProcess->detectorSpeed(type, mDeviceMap[ip]->getCloud()) > 0)
+        {
+            emit sigCSpeedUpdated(ip);
+        }
+    }
+    else if (type == OsightDevice::RADAR_D)
+    {
+        emit sigDThreadCloudUpdated(ip);
+        if (mpDataProcess->detectorSpeed(type, mDeviceMap[ip]->getCloud()) > 0)
+        {
+            emit sigDSpeedUpdated(ip);
+        }
+    }
+    else if (type == OsightDevice::RADAR_E)
+    {
+        emit sigEThreadCloudUpdated(ip);
+        if (mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
+        {
+            emit sigEOutlineUpdated(ip);
+        }
+    }
+    else
+    {
+    }
 }
 
 bool RadarManager::ipJudge(const QString& ip)

@@ -302,14 +302,20 @@ void MainWindow::initVtkWidget()
     viewerA->setupInteractor(ui.qvtkWidget_A->GetInteractor(), ui.qvtkWidget_A->GetRenderWindow());
     viewerB.reset(new pcl::visualization::PCLVisualizer("viewerB", false));
     viewerB->addCoordinateSystem();
+    viewerB->setupInteractor(ui.qvtkWidget_B->GetInteractor(), ui.qvtkWidget_B->GetRenderWindow());
     viewerC.reset(new pcl::visualization::PCLVisualizer("viewerC", false));
     viewerC->addCoordinateSystem();
+    viewerC->setupInteractor(ui.qvtkWidget_C->GetInteractor(), ui.qvtkWidget_C->GetRenderWindow());
     viewerD.reset(new pcl::visualization::PCLVisualizer("viewerD", false));
     viewerD->addCoordinateSystem();
+    viewerD->setupInteractor(ui.qvtkWidget_D->GetInteractor(), ui.qvtkWidget_D->GetRenderWindow());
     viewerE.reset(new pcl::visualization::PCLVisualizer("viewerE", false));
     viewerE->addCoordinateSystem();
+    viewerE->setupInteractor(ui.qvtkWidget_E->GetInteractor(), ui.qvtkWidget_E->GetRenderWindow());
     viewerShow.reset(new pcl::visualization::PCLVisualizer("viewerShow", false));
     viewerShow->addCoordinateSystem();
+    viewerShow->setupInteractor(ui.qvtkWidget_show->GetInteractor(), ui.qvtkWidget_show->GetRenderWindow());
+
     ui.qvtkWidget_A->SetRenderWindow(viewerA->getRenderWindow());
     ui.qvtkWidget_B->SetRenderWindow(viewerB->getRenderWindow());
     ui.qvtkWidget_C->SetRenderWindow(viewerC->getRenderWindow());
@@ -459,37 +465,26 @@ void MainWindow::initConnect()
     connect(ui.doubleSpinBox_ymax_e, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this, &MainWindow::radarEYMaxChange);
 
-    connect(mpRadarManager, &RadarManager::sigThreadCloudUpdated, this, [=](const QString& ip) {
-        //若ip为雷达a地址 则对应显示cloud
-        if (ip == ui.lineEdit_ip_a->text())
-        {
-            updateShow(viewerA,ip,"radar_a");
-            ui.qvtkWidget_A->update();
-        }
-        else if (ip == ui.lineEdit_ip_b->text())
-        {
-            updateShow(viewerB, ip, "radar_b");
-            ui.qvtkWidget_B->update();
-        }
-        else if (ip == ui.lineEdit_ip_c->text())
-        {
-            updateShow(viewerC, ip, "radar_c");
-            ui.qvtkWidget_C->update();
-        }
-        else if (ip == ui.lineEdit_ip_c->text())
-        {
-            updateShow(viewerD, ip, "radar_d");
-            ui.qvtkWidget_D->update();
-        }
-        else if (ip == ui.lineEdit_ip_c->text())
-        {
-            updateShow(viewerE, ip, "radar_e");
-            ui.qvtkWidget_E->update();
-        }
-        else
-        {
-            //TODO:未做处理，为了保持条件结构完整
-        }
+
+    connect(mpRadarManager, &RadarManager::sigAThreadCloudUpdated, this, [=](const QString& ip) {
+        updateShow(viewerA, ip, "radar_a");
+        ui.qvtkWidget_A->update();
+        });
+    connect(mpRadarManager, &RadarManager::sigBThreadCloudUpdated, this, [=](const QString& ip) {
+        updateShow(viewerB, ip, "radar_b");
+        ui.qvtkWidget_B->update();
+        });
+    connect(mpRadarManager, &RadarManager::sigCThreadCloudUpdated, this, [=](const QString& ip) {
+        updateShow(viewerC, ip, "radar_c");
+        ui.qvtkWidget_C->update();
+        });
+    connect(mpRadarManager, &RadarManager::sigDThreadCloudUpdated, this, [=](const QString& ip) {
+        updateShow(viewerD, ip, "radar_d");
+        ui.qvtkWidget_D->update();
+        });
+    connect(mpRadarManager, &RadarManager::sigEThreadCloudUpdated, this, [=](const QString& ip) {
+        updateShow(viewerE, ip, "radar_e");
+        ui.qvtkWidget_E->update();
         });
 }
 

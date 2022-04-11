@@ -6,9 +6,8 @@ OsightMeasureTread::OsightMeasureTread(QObject* parent)
     ,mRadarAddr("192.168.1.10")
     ,mRadarPort(6500)
     ,mLocalAddr("192.168.1.88")
-    ,mLocalPort(6000)
+    ,mLocalPort(5500)
 {
-    mCloud.reset(new PointCloudT);
 }
 
 OsightMeasureTread::~OsightMeasureTread()
@@ -23,6 +22,8 @@ OsightMeasureTread::~OsightMeasureTread()
 void OsightMeasureTread::setDevice(OsightDevice::RadarNumber type)
 {
     mpRadarDevice = new OsightDevice(type);
+    mpRadarDevice->setIp(mRadarAddr);
+    mpRadarDevice->setPort(mRadarPort);
 }
 
 void OsightMeasureTread::setRadarAddr(const QString& addr, short port)
@@ -57,7 +58,7 @@ void OsightMeasureTread::setRadarAngleRes(double angleRes)
     mpRadarDevice->setRadarAngleRes(angleRes);
 }
 
-PointCloudT::Ptr OsightMeasureTread::getCloud()
+ExinovaCloudData OsightMeasureTread::getCloud()
 {
     return mCloud;
 }
@@ -74,53 +75,59 @@ void OsightMeasureTread::run()
         3000))
     {
         //TODO:参数配置
-        mpRadarDevice->setParams();
-        //获取数据点数
-        int pointNum = mpRadarDevice->getPointNum();
-        if (pointNum > 0)
+        //mpRadarDevice->setParams();
+        int nTry = 10;
+        while (nTry > 0)
         {
-            //申请内存
-            LidarData* pData = new LidarData[pointNum];
-            //开始采集
-            mpRadarDevice->startMeasure();
-            while (mIsRun)
+            //获取数据点数
+            int pointNum = mpRadarDevice->getPointNum();
+            if (pointNum > 0)
             {
-                if (mpRadarDevice->getOneFrameData(pData))
+                nTry = 10;
+                //申请内存
+                LidarData* pData = new LidarData[pointNum];
+                //开始采集
+                mpRadarDevice->startMeasure();
+                while (mIsRun)
                 {
-                    lidarDataToCloud(pData, pointNum);
-                }
-                else
-                {
-                    clock_t startTime = clock();
-                    while (mIsRun)
+                    if (mpRadarDevice->getOneFrameData(pData))
                     {
-                        //TODO:重连30分钟
-                        if (((double)(clock() - startTime) / CLOCKS_PER_SEC) >= 1800)
+                        lidarDataToCloud(pData, pointNum);
+                    }
+                    else
+                    {
+                        clock_t startTime = clock();
+                        while (mIsRun)
                         {
-                            mIsRun = false;
-                            emit sigRadarConnectFailed(mpRadarDevice->getIp());
-                            return;
-                        }
-                        else
-                        {
-                            pointNum = mpRadarDevice->getPointNum();
-                            if (pointNum > 0)
+                            //TODO:重连30分钟
+                            if (((double)(clock() - startTime) / CLOCKS_PER_SEC) >= 1800)
                             {
-                                mIsRun = true;
-                                startTime = clock();
-                                //清除缓存区
-                                delete[] pData;
-                                //重新申请缓存区数据
-                                pData = new LidarData[pointNum];
-                                //重新启动测量
-                                mpRadarDevice->startMeasure();
-                                break;
+                                mIsRun = false;
+                                emit sigRadarConnectFailed(mpRadarDevice->getIp());
+                                return;
+                            }
+                            else
+                            {
+                                pointNum = mpRadarDevice->getPointNum();
+                                if (pointNum > 0)
+                                {
+                                    mIsRun = true;
+                                    startTime = clock();
+                                    //清除缓存区
+                                    delete[] pData;
+                                    //重新申请缓存区数据
+                                    pData = new LidarData[pointNum];
+                                    //重新启动测量
+                                    mpRadarDevice->startMeasure();
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+                delete[] pData;
             }
-            delete[] pData;
+            --nTry;
         }
     }
     else
@@ -134,7 +141,7 @@ void OsightMeasureTread::run()
 void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
 {
     QMutexLocker locker(&mMutex);
-    mCloud->clear();
+    mCloud.data()->clear();
     PointT poi;
     for (int i = 0; i < pointNum; ++i)
     {
@@ -146,7 +153,7 @@ void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
         poi.g = 255;
         poi.b = 255;
         poi.a = 255;
-        mCloud->push_back(poi);
+        mCloud.data()->push_back(poi);
     }
 
     emit sigCloudPointUpdated(mpRadarDevice->getIp());

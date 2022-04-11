@@ -38,7 +38,7 @@ public:
     //设置角分辨率
     void setRadarAngleRes(double angleResUi);
 
-    PointCloudT::Ptr getCloud();
+    ExinovaCloudData getCloud();
 
 protected:
     void run();
@@ -67,7 +67,7 @@ private:
     //主机端口号
     short mLocalPort;
     //点云数据
-    PointCloudT::Ptr mCloud;
+    ExinovaCloudData mCloud;
     //锁
     QMutex mMutex;
 };

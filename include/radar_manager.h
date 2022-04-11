@@ -51,7 +51,16 @@ public:
     //获取cloud
     PointCloudT::Ptr getCloud(const QString& ip);
 signals:
-    void sigThreadCloudUpdated(const QString& ip);
+    void sigAThreadCloudUpdated(const QString& ip);
+    void sigBThreadCloudUpdated(const QString& ip);
+    void sigCThreadCloudUpdated(const QString& ip);
+    void sigDThreadCloudUpdated(const QString& ip);
+    void sigEThreadCloudUpdated(const QString& ip);
+    void sigBSpeedUpdated(const QString& ip);
+    void sigCSpeedUpdated(const QString& ip);
+    void sigDSpeedUpdated(const QString& ip);
+    void sigAOutlineUpdated(const QString& ip);
+    void sigEOutlineUpdated(const QString& ip);
 public slots:
     void threadCloudUpdate(const QString& ip);
 private:
@@ -64,5 +73,7 @@ private:
     QMap<QString, OsightMeasureTread*> mDeviceMap;
     //数据处理类
     SingleRadarProcess* mpDataProcess;
+
+    QMutex mMutex;
 };
 #endif // EXINOVA_G524_RADAR_MANAGER__H__
