@@ -50,6 +50,8 @@ public:
         double ymax);
     //获取cloud
     PointCloudT::Ptr getCloud(const QString& ip);
+    //获取速度
+    double getSpeed(const QString& ip);
 signals:
     void sigAThreadCloudUpdated(const QString& ip);
     void sigBThreadCloudUpdated(const QString& ip);

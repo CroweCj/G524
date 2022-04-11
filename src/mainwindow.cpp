@@ -486,6 +486,11 @@ void MainWindow::initConnect()
         updateShow(viewerE, ip, "radar_e");
         ui.qvtkWidget_E->update();
         });
+    connect(mpRadarManager, &RadarManager::sigAOutlineUpdated, this, [=](const QString& ip) {
+        ui.lcdNumber_speed->display(mpRadarManager->getSpeed(ip));
+        updateShow(viewerShow, ip, "outline");
+        ui.qvtkWidget_show->update();
+        });
 }
 
 void MainWindow::updateSettings()

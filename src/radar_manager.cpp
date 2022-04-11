@@ -147,6 +147,12 @@ PointCloudT::Ptr RadarManager::getCloud(const QString& ip)
     return mDeviceMap[ip]->getCloud().data();
 }
 
+double RadarManager::getSpeed(const QString& ip)
+{
+    OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
+    return mpDataProcess->getSpeed(type);
+}
+
 void RadarManager::threadCloudUpdate(const QString& ip)
 {
     OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
