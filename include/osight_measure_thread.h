@@ -38,7 +38,7 @@ public:
     //…Ë÷√Ω«∑÷±Ê¬ 
     void setRadarAngleRes(double angleResUi);
 
-    ExinovaCloudData getCloud();
+    ExinovaCloudData& getCloud();
 
 protected:
     void run();

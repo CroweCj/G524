@@ -233,7 +233,7 @@ void MainWindow::radarEConnect()
         ui.doubleSpinBox_xmax_e->value(),
         ui.doubleSpinBox_ymin_e->value(),
         ui.doubleSpinBox_ymax_e->value());
-    mpRadarManager->connect(ip, OsightDevice::RADAR_C);
+    mpRadarManager->connect(ip, OsightDevice::RADAR_E);
 }
 
 void MainWindow::radarEDisconnect()
@@ -456,7 +456,13 @@ void MainWindow::initConnect()
         });
     connect(mpRadarManager, &RadarManager::sigAOutlineUpdated, this, [=](const QString& ip) {
         ui.lcdNumber_speed->display(mpRadarManager->getSpeed(ip));
-        updateShow(viewerShow, ip, "outline");
+        PointCloudT::Ptr cloud = mpRadarManager->getOutlineCloud(ip);
+        std::string str = "outline";
+        viewerShow->removeAllPointClouds();
+        viewerShow->removeAllShapes();
+        viewerShow->addPointCloud(cloud, str);
+        viewerShow->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, str);
+        viewerShow->updatePointCloud(cloud, str);
         ui.qvtkWidget_show->update();
         });
 }

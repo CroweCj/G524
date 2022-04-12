@@ -20,6 +20,12 @@ void RadarManager::init()
 {
     //TODO:´ýÍê³É
     mpDataProcess = new SingleRadarProcess(5);
+
+    for (int i = 0; i < 5; ++i)
+    {
+        ExinovaCloudData data;
+        mOutlineCloudMap[i] = data;
+    }
 }
 
 bool RadarManager::addDevice(const QString& ip, int type)
@@ -153,6 +159,12 @@ double RadarManager::getSpeed(const QString& ip)
     return mpDataProcess->getSpeed(type);
 }
 
+PointCloudT::Ptr RadarManager::getOutlineCloud(const QString& ip)
+{
+    OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
+    return mOutlineCloudMap[type].data();
+}
+
 void RadarManager::threadCloudUpdate(const QString& ip)
 {
     OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
@@ -180,11 +192,13 @@ void RadarManager::threadCloudUpdate(const QString& ip)
 
     if (type == OsightDevice::RADAR_A)
     {
+        QMutexLocker locker(&mMutex);
         emit sigAThreadCloudUpdated(ip);
         if (mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
         {
             emit sigAOutlineUpdated(ip);
         }
+        mOutlineCloudMap[type] = mDeviceMap[ip]->getCloud();
     }
     else if (type == OsightDevice::RADAR_B)
     {
@@ -212,11 +226,13 @@ void RadarManager::threadCloudUpdate(const QString& ip)
     }
     else if (type == OsightDevice::RADAR_E)
     {
+        QMutexLocker locker(&mMutex);
         emit sigEThreadCloudUpdated(ip);
         if (mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
         {
             emit sigEOutlineUpdated(ip);
         }
+        mOutlineCloudMap[type] = mDeviceMap[ip]->getCloud();
     }
     else
     {

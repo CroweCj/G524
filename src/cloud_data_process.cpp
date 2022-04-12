@@ -344,3 +344,17 @@ void SingleRadarProcess::detectorOutliers(int num, ExinovaCloudData& data)
     data.data()->clear();
     data += outliers_data;
 }
+
+ExinovaCloudData SingleRadarProcess::getOutlineData(int id)
+{
+    QMutexLocker locker(&mMutex);
+    std::map<int, DetectOutlineData>::iterator it = mOutlineMap.find(id);
+    if (it == mOutlineMap.end())
+    {
+        return ExinovaCloudData();
+    }
+    else
+    {
+        return it->second.data;
+    }
+}

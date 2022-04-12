@@ -52,6 +52,9 @@ public:
     PointCloudT::Ptr getCloud(const QString& ip);
     //获取速度
     double getSpeed(const QString& ip);
+    //获取轮廓数据
+    PointCloudT::Ptr getOutlineCloud(const QString& ip);
+
 signals:
     void sigAThreadCloudUpdated(const QString& ip);
     void sigBThreadCloudUpdated(const QString& ip);
@@ -73,6 +76,8 @@ private:
 private:
     //存储设备信息
     QMap<QString, OsightMeasureTread*> mDeviceMap;
+    //存储轮廓数据
+    QMap<int, ExinovaCloudData> mOutlineCloudMap;
     //数据处理类
     SingleRadarProcess* mpDataProcess;
 

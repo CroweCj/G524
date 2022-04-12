@@ -58,7 +58,7 @@ void OsightMeasureTread::setRadarAngleRes(double angleRes)
     mpRadarDevice->setRadarAngleRes(angleRes);
 }
 
-ExinovaCloudData OsightMeasureTread::getCloud()
+ExinovaCloudData& OsightMeasureTread::getCloud()
 {
     return mCloud;
 }

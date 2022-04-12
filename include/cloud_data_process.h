@@ -49,6 +49,9 @@ public:
     double getSpeed(int id);
 
     void detectorOutliers(int num, ExinovaCloudData& data);
+
+    ExinovaCloudData getOutlineData(int id);
+
 private:
     void init();
 
