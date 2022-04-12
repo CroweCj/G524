@@ -67,7 +67,6 @@ void OsightMeasureTread::run()
 {
     mIsRun = true;
 
-    //TODO:配置雷达和本机地址
     if (mpRadarDevice->open(mRadarAddr.toStdString().c_str(),
         mRadarPort,
         mLocalAddr.toStdString().c_str(),
@@ -75,7 +74,7 @@ void OsightMeasureTread::run()
         3000))
     {
         //TODO:参数配置
-        //mpRadarDevice->setParams();
+        mpRadarDevice->setParams();
         int nTry = 10;
         while (nTry > 0)
         {

@@ -51,7 +51,7 @@ public:
     void detectorOutliers(int num, ExinovaCloudData& data);
 private:
     void init();
-    //TODO:²âËÙËã·¨
+
     double countSpeed(int radarId, ExinovaCloudData& data, bool isReverse);
 
     bool coordinataTrans(int radarId, ExinovaCloudData& data);

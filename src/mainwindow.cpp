@@ -67,7 +67,6 @@ void MainWindow::setBackgroundColor(pcl::visualization::PCLVisualizer::Ptr viewe
 
 void MainWindow::radarAConnect()
 {
-    //TODO:
     QString ip = ui.lineEdit_ip_a->text();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_a->value(),
@@ -79,41 +78,35 @@ void MainWindow::radarAConnect()
 
 void MainWindow::radarADisconnect()
 {
-    //TODO:
     mpRadarManager->disconnect(ui.lineEdit_ip_a->text());
 }
 
 void MainWindow::radarAXMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMin(ui.lineEdit_ip_a->text(),
         ui.doubleSpinBox_xmin_a->value());
 }
 
 void MainWindow::radarAXMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMax(ui.lineEdit_ip_a->text(),
         ui.doubleSpinBox_xmax_a->value());
 }
 
 void MainWindow::radarAYMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMin(ui.lineEdit_ip_a->text(),
         ui.doubleSpinBox_ymin_a->value());
 }
 
 void MainWindow::radarAYMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMax(ui.lineEdit_ip_a->text(),
         ui.doubleSpinBox_ymax_a->value());
 }
 
 void MainWindow::radarBConnect()
 {
-    //TODO:
     QString ip = ui.lineEdit_ip_b->text();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_b->value(),
@@ -125,41 +118,35 @@ void MainWindow::radarBConnect()
 
 void MainWindow::radarBDisconnect()
 {
-    //TODO:
     mpRadarManager->disconnect(ui.lineEdit_ip_b->text());
 }
 
 void MainWindow::radarBXMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMin(ui.lineEdit_ip_b->text(),
         ui.doubleSpinBox_xmin_b->value());
 }
 
 void MainWindow::radarBXMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMax(ui.lineEdit_ip_b->text(),
         ui.doubleSpinBox_xmax_b->value());
 }
 
 void MainWindow::radarBYMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMin(ui.lineEdit_ip_b->text(),
         ui.doubleSpinBox_ymin_b->value());
 }
 
 void MainWindow::radarBYMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMax(ui.lineEdit_ip_b->text(),
         ui.doubleSpinBox_ymax_b->value());
 }
 
 void MainWindow::radarCConnect()
 {
-    //TODO:
     QString ip = ui.lineEdit_ip_c->text();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_c->value(),
@@ -171,41 +158,35 @@ void MainWindow::radarCConnect()
 
 void MainWindow::radarCDisconnect()
 {
-    //TODO:
     mpRadarManager->disconnect(ui.lineEdit_ip_c->text());
 }
 
 void MainWindow::radarCXMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMin(ui.lineEdit_ip_c->text(),
         ui.doubleSpinBox_xmin_c->value());
 }
 
 void MainWindow::radarCXMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMax(ui.lineEdit_ip_c->text(),
         ui.doubleSpinBox_xmax_c->value());
 }
 
 void MainWindow::radarCYMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMin(ui.lineEdit_ip_c->text(),
         ui.doubleSpinBox_ymin_c->value());
 }
 
 void MainWindow::radarCYMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMax(ui.lineEdit_ip_c->text(),
         ui.doubleSpinBox_ymax_c->value());
 }
 
 void MainWindow::radarDConnect()
 {
-    //TODO:
     QString ip = ui.lineEdit_ip_d->text();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_d->value(),
@@ -217,41 +198,35 @@ void MainWindow::radarDConnect()
 
 void MainWindow::radarDDisconnect()
 {
-    //TODO:
     mpRadarManager->disconnect(ui.lineEdit_ip_d->text());
 }
 
 void MainWindow::radarDXMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMin(ui.lineEdit_ip_d->text(),
         ui.doubleSpinBox_xmin_d->value());
 }
 
 void MainWindow::radarDXMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMax(ui.lineEdit_ip_d->text(),
         ui.doubleSpinBox_xmax_d->value());
 }
 
 void MainWindow::radarDYMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMin(ui.lineEdit_ip_d->text(),
         ui.doubleSpinBox_ymin_d->value());
 }
 
 void MainWindow::radarDYMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMax(ui.lineEdit_ip_d->text(),
         ui.doubleSpinBox_ymax_d->value());
 }
 
 void MainWindow::radarEConnect()
 {
-    //TODO:
     QString ip = ui.lineEdit_ip_e->text();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_e->value(),
@@ -263,34 +238,29 @@ void MainWindow::radarEConnect()
 
 void MainWindow::radarEDisconnect()
 {
-    //TODO:
     mpRadarManager->disconnect(ui.lineEdit_ip_e->text());
 }
 
 void MainWindow::radarEXMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMin(ui.lineEdit_ip_e->text(),
         ui.doubleSpinBox_xmin_e->value());
 }
 
 void MainWindow::radarEXMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadarxMax(ui.lineEdit_ip_e->text(),
         ui.doubleSpinBox_xmax_e->value());
 }
 
 void MainWindow::radarEYMinChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMin(ui.lineEdit_ip_e->text(),
         ui.doubleSpinBox_ymin_e->value());
 }
 
 void MainWindow::radarEYMaxChange(double value)
 {
-    //TODO:
     mpRadarManager->setRadaryMax(ui.lineEdit_ip_e->text(),
         ui.doubleSpinBox_ymax_e->value());
 }
@@ -344,7 +314,6 @@ void MainWindow::initVtkWidget()
 
 void MainWindow::initUi()
 {
-    //TODO:待完成
     //显示雷达设置标签页
     ui.tabWidget_radar_setting->setCurrentIndex(RADAR_SETTING);
     //显示雷达b
@@ -408,7 +377,6 @@ void MainWindow::initUi()
 
 void MainWindow::initConnect()
 {
-    //TODO:待完成
     connect(ui.pushButton_con_a, &QPushButton::clicked, this, &MainWindow::radarAConnect);
     connect(ui.pushButton_con_b, &QPushButton::clicked, this, &MainWindow::radarBConnect);
     connect(ui.pushButton_con_c, &QPushButton::clicked, this, &MainWindow::radarCConnect);
