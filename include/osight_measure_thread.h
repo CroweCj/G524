@@ -21,6 +21,13 @@ public:
 
     ~OsightMeasureTread();
 
+    enum State
+    {
+        Stoped,     //停止状态，包括从未启动过和启动后被停止
+        Running,    //运行状态
+        Paused      //暂停状态
+    };
+
     void setDevice(OsightDevice::RadarNumber type);
 
     OsightDevice* getDevice() { return mpRadarDevice; }
@@ -28,8 +35,6 @@ public:
     void setRadarAddr(const QString& addr, short port);
 
     void setLocalAddr(const QString& addr, short port);
-
-    void stop();
     //设置转速
     //范围5-30
     void setRadarSpeed(unsigned char speed);
@@ -39,6 +44,16 @@ public:
     void setRadarAngleRes(double angleResUi);
 
     ExinovaCloudData& getCloud();
+
+    State state() const;
+public slots:
+    void start(Priority pri = InheritPriority);
+
+    void stop();
+
+    void pause();
+
+    void resume();
 
 protected:
     void run();
@@ -57,18 +72,22 @@ private:
     //设备
     OsightDevice* mpRadarDevice;
     //是否运行
-    bool mIsRun;
-    //雷达地址
+    State mStatus;
+    //雷达地址 后续可移除
     QString mRadarAddr;
-    //雷达端口号
+    //雷达端口号 后续可移除
     short mRadarPort;
-    //主机地址
+    //主机地址 后续可移除
     QString mLocalAddr;
-    //主机端口号
+    //主机端口号 后续可移除
     short mLocalPort;
     //点云数据
     ExinovaCloudData mCloud;
     //锁
     QMutex mMutex;
+    //暂停标志
+    std::atomic_bool mPauseFlag;
+    //终止标志
+    std::atomic_bool mStopFlag;
 };
 #endif // EXINOVA_G524_OSIGHT_MEASURE_THREAD__H__

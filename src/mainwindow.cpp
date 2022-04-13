@@ -465,6 +465,8 @@ void MainWindow::initConnect()
         viewerShow->updatePointCloud(cloud, str);
         ui.qvtkWidget_show->update();
         });
+
+    //TODO:端口变动 数据未更新
 }
 
 void MainWindow::updateSettings()

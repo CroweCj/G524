@@ -9,6 +9,7 @@
 *****************************************************************************/
 #include <QObject>
 #include <QMap>
+#include <map>
 #include <QString>
 #include "osight_measure_thread.h"
 
@@ -25,13 +26,13 @@ public:
     //初始化
     void init();
     //添加设备
-    bool addDevice(const QString& ip, int type);
+    bool addDevice(const QString& ip, const int& port, int type);
     //判断设备是否存在
     bool isDevExist(const QString& ip);
     //移除设备
     void removeDevice(const QString& ip);
     //设备连接
-    void connect(const QString& ip, int type);
+    void connect(const QString& ip, const int& port, int type);
     //设备断开连接
     void disconnect(const QString& ip);
     //设置xmin
@@ -77,7 +78,7 @@ private:
     //存储设备信息
     QMap<QString, OsightMeasureTread*> mDeviceMap;
     //存储轮廓数据
-    QMap<int, ExinovaCloudData> mOutlineCloudMap;
+    std::map<int, ExinovaCloudData> mOutlineCloudMap;
     //数据处理类
     SingleRadarProcess* mpDataProcess;
 

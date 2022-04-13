@@ -28,12 +28,15 @@ void RadarManager::init()
     }
 }
 
-bool RadarManager::addDevice(const QString& ip, int type)
+bool RadarManager::addDevice(const QString& ip, const int& port, int type)
 {
     if (!isDevExist(ip) && ipJudge(ip))
     {
         OsightMeasureTread* pThread = new OsightMeasureTread();
         pThread->setDevice((OsightDevice::RadarNumber)type);
+        pThread->getDevice()->setIp(ip);
+        pThread->getDevice()->setPort(port);
+        pThread->setRadarAddr(ip, port);
         mDeviceMap.insert(ip, pThread);
 
         QObject::connect(pThread, &OsightMeasureTread::sigCloudPointUpdated, 
@@ -64,14 +67,14 @@ void RadarManager::removeDevice(const QString& ip)
     }
 }
 
-void RadarManager::connect(const QString& ip, int type)
+void RadarManager::connect(const QString& ip, const int& port, int type)
 {
     QMap<QString, OsightMeasureTread*>::iterator it = mDeviceMap.find(ip);
     if (it != mDeviceMap.end())
     {
         //¿ªÊ¼²âÁ¿
         it.value()->getDevice()->setEnable(true);
-        it.value()->start();
+        it.value()->resume();
     }
     else
     {
@@ -91,7 +94,7 @@ void RadarManager::disconnect(const QString& ip)
     QMap<QString, OsightMeasureTread*>::iterator it = mDeviceMap.find(ip);
     if (it != mDeviceMap.end())
     {
-        it.value()->stop();
+        it.value()->pause();
     }
 }
 

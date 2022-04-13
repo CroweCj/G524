@@ -2,21 +2,22 @@
 #include <time.h>
 OsightMeasureTread::OsightMeasureTread(QObject* parent)
     :QThread(parent)
-    ,mIsRun(false)
     ,mRadarAddr("192.168.1.10")
     ,mRadarPort(6500)
     ,mLocalAddr("192.168.1.88")
     ,mLocalPort(5500)
+    ,mPauseFlag(false)
+    ,mStopFlag(false)
 {
 }
 
 OsightMeasureTread::~OsightMeasureTread()
 {
+    stop();
     mpRadarDevice->stopMeasure();
     mpRadarDevice->close();
     if (mpRadarDevice != NULL)
         delete mpRadarDevice;
-
 }
 
 void OsightMeasureTread::setDevice(OsightDevice::RadarNumber type)
@@ -36,11 +37,6 @@ void OsightMeasureTread::setLocalAddr(const QString& addr, short port)
 {
     mLocalAddr = addr;
     mLocalPort = port;
-}
-
-void OsightMeasureTread::stop()
-{
-    mIsRun = false;
 }
 
 void OsightMeasureTread::setRadarSpeed(unsigned char speed)
@@ -63,10 +59,58 @@ ExinovaCloudData& OsightMeasureTread::getCloud()
     return mCloud;
 }
 
+OsightMeasureTread::State OsightMeasureTread::state() const
+{
+    State sta = Stoped;
+    if (!QThread::isRunning())
+    {
+        sta = Stoped;
+    }
+    else if (QThread::isRunning() && mPauseFlag)
+    {
+        sta = Paused;
+    }
+    else if (QThread::isRunning() && (!mPauseFlag))
+    {
+        sta = Running;
+    }
+
+    return sta;
+}
+
+void OsightMeasureTread::start(Priority pri)
+{
+    QThread::start(pri);
+}
+
+void OsightMeasureTread::stop()
+{
+    if (QThread::isRunning())
+    {
+        mStopFlag = true;
+        QThread::quit();
+        QThread::wait();
+    }
+}
+
+void OsightMeasureTread::pause()
+{
+    if (QThread::isRunning())
+    {
+        mPauseFlag = true;
+    }
+}
+
+void OsightMeasureTread::resume()
+{
+    if (QThread::isRunning())
+    {
+        mPauseFlag = false;
+    }
+}
+
 void OsightMeasureTread::run()
 {
-    mIsRun = true;
-
     if (mpRadarDevice->open(mRadarAddr.toStdString().c_str(),
         mRadarPort,
         mLocalAddr.toStdString().c_str(),
@@ -76,57 +120,61 @@ void OsightMeasureTread::run()
         //TODO:参数配置
         mpRadarDevice->setParams();
         int nTry = 10;
-        while (nTry > 0)
+        while (nTry > 0 && !mStopFlag)
         {
-            //获取数据点数
-            int pointNum = mpRadarDevice->getPointNum();
-            if (pointNum > 0)
+            if (!mPauseFlag)
             {
-                nTry = 10;
-                //申请内存
-                LidarData* pData = new LidarData[pointNum];
-                //开始采集
-                mpRadarDevice->startMeasure();
-                while (mIsRun)
+                //获取数据点数
+                int pointNum = mpRadarDevice->getPointNum();
+                if (pointNum > 0)
                 {
-                    if (mpRadarDevice->getOneFrameData(pData))
+                    nTry = 10;
+                    //申请内存
+                    LidarData* pData = new LidarData[pointNum];
+                    //开始采集
+                    mpRadarDevice->startMeasure();
+                    while (!mStopFlag && !mPauseFlag)
                     {
-                        lidarDataToCloud(pData, pointNum);
-                    }
-                    else
-                    {
-                        clock_t startTime = clock();
-                        while (mIsRun)
+                        if (mpRadarDevice->getOneFrameData(pData))
                         {
-                            //TODO:重连30分钟
-                            if (((double)(clock() - startTime) / CLOCKS_PER_SEC) >= 1800)
+                            lidarDataToCloud(pData, pointNum);
+                        }
+                        else
+                        {
+                            clock_t startTime = clock();
+                            State sta = state();
+                            while (sta == Running)
                             {
-                                mIsRun = false;
-                                emit sigRadarConnectFailed(mpRadarDevice->getIp());
-                                return;
-                            }
-                            else
-                            {
-                                pointNum = mpRadarDevice->getPointNum();
-                                if (pointNum > 0)
+                                //TODO:重连30分钟
+                                if (((double)(clock() - startTime) / CLOCKS_PER_SEC) >= 1800)
                                 {
-                                    mIsRun = true;
-                                    startTime = clock();
-                                    //清除缓存区
-                                    delete[] pData;
-                                    //重新申请缓存区数据
-                                    pData = new LidarData[pointNum];
-                                    //重新启动测量
-                                    mpRadarDevice->startMeasure();
-                                    break;
+                                    stop();
+                                    emit sigRadarConnectFailed(mpRadarDevice->getIp());
+                                    return;
+                                }
+                                else
+                                {
+                                    pointNum = mpRadarDevice->getPointNum();
+                                    if (pointNum > 0)
+                                    {
+                                        resume();
+                                        startTime = clock();
+                                        //清除缓存区
+                                        delete[] pData;
+                                        //重新申请缓存区数据
+                                        pData = new LidarData[pointNum];
+                                        //重新启动测量
+                                        mpRadarDevice->startMeasure();
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
+                    delete[] pData;
                 }
-                delete[] pData;
+                --nTry;
             }
-            --nTry;
         }
     }
     else
