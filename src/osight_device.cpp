@@ -21,10 +21,10 @@ bool OsightDevice::open(const QString& local,
     int timeout)
 {
     QMutexLocker locker(&mMutex);
-    bool status = mpDriver->connect(local.toStdString().c_str(),
-                    localPort,
-                    device.toStdString().c_str(),
-                    devicePort);
+    bool status = mpDriver->connect(device.toStdString().c_str(),
+        devicePort,
+        local.toStdString().c_str(),
+        localPort);
     mEnable = status;
 
     return status;

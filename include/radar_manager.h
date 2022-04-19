@@ -55,6 +55,8 @@ public:
     double getSpeed(const QString& ip);
     //获取轮廓数据
     PointCloudT::Ptr getOutlineCloud(const QString& ip);
+    
+    void setFileName(const QString& ip, const QString& fileName);
 
 signals:
     void sigAThreadCloudUpdated(const QString& ip);

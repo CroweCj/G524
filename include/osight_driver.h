@@ -82,6 +82,8 @@ private:
     sockaddr_in mRemoteAddr;
 
     sockaddr_in mHostAddr;
+    //用来判断远端返回数据与mRemoteAddr地址是否相同
+    sockaddr_in mRemoteCmp;
 
     bool mIsBigEnd;
 

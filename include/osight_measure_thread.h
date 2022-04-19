@@ -46,6 +46,9 @@ public:
     ExinovaCloudData& getCloud();
 
     State state() const;
+
+    void setFileName(const QString& fileName, bool writeEnabled) { mFilePath = fileName; mWriteEnabled = writeEnabled; }
+
 public slots:
     void start(Priority pri = InheritPriority);
 
@@ -89,5 +92,9 @@ private:
     std::atomic_bool mPauseFlag;
     //终止标志
     std::atomic_bool mStopFlag;
+    //文件地址
+    QString mFilePath;
+
+    std::atomic_bool mWriteEnabled;
 };
 #endif // EXINOVA_G524_OSIGHT_MEASURE_THREAD__H__

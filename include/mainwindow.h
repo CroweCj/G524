@@ -8,6 +8,7 @@
 * @Version: ver 1.0
 *****************************************************************************/
 #include <QtWidgets/QMainWindow>
+#include <QMutex>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>
@@ -16,6 +17,9 @@
 #include "cloud_data_process.h"
 #include "config_setting.h"
 #include "radar_manager.h"
+//#include "cloud_data_read_thread.h"
+class DataReadThread;
+
 typedef enum FunctionWidgetIndex
 {
     RADAR_SETTING = 0,      //雷达设置
@@ -99,6 +103,11 @@ private:
     void updateShow(pcl::visualization::PCLVisualizer::Ptr viewer,
         const QString& ip,
         const QString& cloudId);
+
+    void initFileRead();
+
+    void initFileWrite();
+
 private:
     Ui::mainwindow ui;
     //雷达ABCDE对应Visualizer
@@ -107,6 +116,11 @@ private:
     pcl::visualization::PCLVisualizer::Ptr viewerShow;
 
     RadarManager* mpRadarManager;
+
+    //文件读取线程
+    DataReadThread* mpDataReadThread;
+
+    QMutex mMutex;
 };
 
 #endif // OSIGHT_RADAR_PCL_MAINWINDOW__H__

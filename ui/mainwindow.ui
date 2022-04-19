@@ -1052,7 +1052,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionradarSetting"/>
-   <addaction name="actionAreaSetting"/>
+   <addaction name="actionFileRead"/>
    <addaction name="actionDectorSetting"/>
    <addaction name="actionLog"/>
    <addaction name="actionDataCol"/>
@@ -1068,9 +1068,12 @@
     <string>雷达设置</string>
    </property>
   </action>
-  <action name="actionAreaSetting">
+  <action name="actionFileRead">
    <property name="text">
-    <string>检测区设置</string>
+    <string>文件读取</string>
+   </property>
+   <property name="toolTip">
+    <string>文件读取</string>
    </property>
   </action>
   <action name="actionDectorSetting">

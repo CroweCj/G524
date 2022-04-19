@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include <math.h>
+#include <QFileDialog>
+#include "cloud_data_read_thread.h"
 #define CLOUD_TEST
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -35,6 +37,7 @@ MainWindow::~MainWindow()
 {
     updateSettings();
     delete mpRadarManager;
+    mpDataReadThread->deleteLater();
 }
 
 void MainWindow::init()
@@ -58,6 +61,10 @@ void MainWindow::init()
     initUi();
 
     initConnect();
+
+    initFileRead();
+
+    initFileWrite();
 }
 
 void MainWindow::setBackgroundColor(pcl::visualization::PCLVisualizer::Ptr viewer,double r, double g, double b)
@@ -68,12 +75,13 @@ void MainWindow::setBackgroundColor(pcl::visualization::PCLVisualizer::Ptr viewe
 void MainWindow::radarAConnect()
 {
     QString ip = ui.lineEdit_ip_a->text();
+    int port = ui.spinBox_port_a->value();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_a->value(),
         ui.doubleSpinBox_xmax_a->value(),
         ui.doubleSpinBox_ymin_a->value(),
         ui.doubleSpinBox_ymax_a->value());
-    mpRadarManager->connect(ip, OsightDevice::RADAR_A);
+    mpRadarManager->connect(ip, port, OsightDevice::RADAR_A);
 }
 
 void MainWindow::radarADisconnect()
@@ -108,12 +116,13 @@ void MainWindow::radarAYMaxChange(double value)
 void MainWindow::radarBConnect()
 {
     QString ip = ui.lineEdit_ip_b->text();
+    int port = ui.spinBox_port_b->value();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_b->value(),
         ui.doubleSpinBox_xmax_b->value(),
         ui.doubleSpinBox_ymin_b->value(),
         ui.doubleSpinBox_ymax_b->value());
-    mpRadarManager->connect(ip, OsightDevice::RADAR_B);
+    mpRadarManager->connect(ip, port, OsightDevice::RADAR_B);
 }
 
 void MainWindow::radarBDisconnect()
@@ -148,12 +157,13 @@ void MainWindow::radarBYMaxChange(double value)
 void MainWindow::radarCConnect()
 {
     QString ip = ui.lineEdit_ip_c->text();
+    int port = ui.spinBox_port_c->value();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_c->value(),
         ui.doubleSpinBox_xmax_c->value(),
         ui.doubleSpinBox_ymin_c->value(),
         ui.doubleSpinBox_ymax_c->value());
-    mpRadarManager->connect(ip, OsightDevice::RADAR_C);
+    mpRadarManager->connect(ip, port,OsightDevice::RADAR_C);
 }
 
 void MainWindow::radarCDisconnect()
@@ -188,12 +198,13 @@ void MainWindow::radarCYMaxChange(double value)
 void MainWindow::radarDConnect()
 {
     QString ip = ui.lineEdit_ip_d->text();
+    int port = ui.spinBox_port_d->value();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_d->value(),
         ui.doubleSpinBox_xmax_d->value(),
         ui.doubleSpinBox_ymin_d->value(),
         ui.doubleSpinBox_ymax_d->value());
-    mpRadarManager->connect(ip, OsightDevice::RADAR_D);
+    mpRadarManager->connect(ip, port,OsightDevice::RADAR_D);
 }
 
 void MainWindow::radarDDisconnect()
@@ -228,12 +239,13 @@ void MainWindow::radarDYMaxChange(double value)
 void MainWindow::radarEConnect()
 {
     QString ip = ui.lineEdit_ip_e->text();
+    int port = ui.spinBox_port_e->value();
     mpRadarManager->setRadarThd(ip,
         ui.doubleSpinBox_xmin_e->value(),
         ui.doubleSpinBox_xmax_e->value(),
         ui.doubleSpinBox_ymin_e->value(),
         ui.doubleSpinBox_ymax_e->value());
-    mpRadarManager->connect(ip, OsightDevice::RADAR_E);
+    mpRadarManager->connect(ip, port, OsightDevice::RADAR_E);
 }
 
 void MainWindow::radarEDisconnect()
@@ -516,6 +528,62 @@ void MainWindow::updateShow(pcl::visualization::PCLVisualizer::Ptr viewer, const
     viewer->addPointCloud(cloud, str);
     viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, str);
     viewer->updatePointCloud(cloud, str);
+}
+
+void MainWindow::initFileRead()
+{
+    mpDataReadThread = new DataReadThread();
+
+    connect(ui.actionOpenDir, &QAction::triggered, this, [=](bool togged) {
+        QString filePath = QFileDialog::getOpenFileName(this,
+            tr("Open Data File"),
+            tr("%1").arg(QApplication::applicationFilePath()),
+            tr("Data File(*.dat *.pcd *.txt)"));
+        mpDataReadThread->setFileName(filePath);
+        });
+    connect(ui.actionPlay, &QAction::triggered, this, [=](bool togged) {
+        mpDataReadThread->start();
+        });
+    connect(mpDataReadThread, &DataReadThread::sigDataIsReady, this, [=]() {
+        PointCloudT::Ptr cloud = mpDataReadThread->getCloud().data();
+        viewerB->removeAllPointClouds();
+        viewerB->removeAllShapes();
+        viewerB->addPointCloud(cloud, "test");
+        viewerB->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "test");
+        viewerB->updatePointCloud(cloud, "test");
+        ui.qvtkWidget_B->update();
+        });
+}
+
+void MainWindow::initFileWrite()
+{
+    connect(ui.actionDataCol, &QAction::triggered, this, [=]() {
+        QString filePath = QFileDialog::getOpenFileName(this,
+            tr("Open Data File"),
+            tr("%1").arg(QApplication::applicationFilePath()),
+            tr("Data File(*.dat *.pcd *.txt)"));
+        int index = ui.tabWidget_A->currentIndex();
+        if (index == RADAR_B)
+        {
+            mpRadarManager->setFileName(ui.lineEdit_ip_b->text(), filePath);
+        }
+        else if (index == RADAR_C)
+        {
+            mpRadarManager->setFileName(ui.lineEdit_ip_c->text(), filePath);
+        }
+        else if (index == RADAR_D)
+        {
+            mpRadarManager->setFileName(ui.lineEdit_ip_d->text(), filePath);
+        }
+        else if (index == RADAR_E)
+        {
+            mpRadarManager->setFileName(ui.lineEdit_ip_e->text(), filePath);
+        }
+        else
+        {
+            mpRadarManager->setFileName(ui.lineEdit_ip_a->text(), filePath);
+        }
+        });
 }
 
 

@@ -2,6 +2,7 @@
 #include <time.h>
 #include <string>
 #include "osight_driver.h"
+#include "socket_global.h"
 unsigned char auchCRCHi1[] =
 {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
@@ -70,7 +71,7 @@ OsightRadarDriver::OsightRadarDriver()
 
 OsightRadarDriver::~OsightRadarDriver()
 {
-    
+    disconnect();
 }
 
 bool OsightRadarDriver::connect(const char* radarIp,
@@ -78,12 +79,7 @@ bool OsightRadarDriver::connect(const char* radarIp,
     const char* localIp,
     const unsigned short localPort)
 {
-    WSADATA  wsaData;
-    WORD  sockVersion = MAKEWORD(2, 2);
-    if (WSAStartup(sockVersion, &wsaData) != 0)
-    {
-        return false;
-    }
+
     mRemoteAddr.sin_family = AF_INET;
     mRemoteAddr.sin_port = htons(radarPort);
     mRemoteAddr.sin_addr.s_addr = inet_addr(radarIp);
@@ -93,31 +89,14 @@ bool OsightRadarDriver::connect(const char* radarIp,
     mHostAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
     mHostAddr.sin_addr.s_addr = htons(INADDR_ANY);
 
-    mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    int mode = 1;
-    ioctlsocket(mSocket, FIONBIO, (u_long FAR*)& mode);
-    if(mSocket == INVALID_SOCKET)
-    {
-        return false;
-    }
-    clock_t startTime = clock();
-    while (bind(mSocket, (sockaddr*)&mHostAddr, sizeof(mHostAddr)) == SOCKET_ERROR)
-    {
-        if (((double)(clock() - startTime) / CLOCKS_PER_SEC) * 1000 
-            >= mTimeOut)
-        {
-            return false;
-        }
-    }
-
-    return true;
+    mSocket = UdpSocket::getSocket();
+    return UdpSocket::sockBind("192.168.1.100", 5500, mTimeOut);
 }
 
 void OsightRadarDriver::disconnect()
 {
     stopMeasure();
     closesocket(mSocket);
-    WSACleanup();
 }
 
 bool OsightRadarDriver::startMeasure()
@@ -191,8 +170,12 @@ int OsightRadarDriver::paramSyncRsp()
             char recvBuf[1462];
             memset(recvBuf, 0, sizeof(recvBuf));
             int remoteAddrLen = sizeof(mRemoteAddr);
-            if(recvfrom(mSocket,recvBuf,1462,0,(sockaddr*)&mRemoteAddr,&remoteAddrLen) > 0)
+            if (recvfrom(mSocket, recvBuf, 1462, 0, (sockaddr*)&mRemoteCmp, &remoteAddrLen) > 0)
             {
+                if (mRemoteCmp.sin_addr.S_un.S_addr != mRemoteAddr.sin_addr.S_un.S_addr)
+                {
+                    continue;
+                }
                 char* pBuf = recvBuf;
                 unsigned int messageId;
                 UnPack4Byte(&pBuf, messageId);
@@ -261,8 +244,12 @@ int OsightRadarDriver::paramConfigRsp(unsigned char spped,
             char recvBuf[1462];
             memset(recvBuf, 0, sizeof(recvBuf));
             int remoteAddrLen = sizeof(mRemoteAddr);
-            if (recvfrom(mSocket, recvBuf, 1462, 0, (sockaddr*)&mRemoteAddr, &remoteAddrLen) > 0)
+            if (recvfrom(mSocket, recvBuf, 1462, 0, (sockaddr*)&mRemoteCmp, &remoteAddrLen) > 0)
             {
+                if (mRemoteCmp.sin_addr.S_un.S_addr != mRemoteAddr.sin_addr.S_un.S_addr)
+                {
+                    continue;
+                }
                 char* pBuf = recvBuf;
                 unsigned int messageId;
                 UnPack4Byte(&pBuf, messageId);
@@ -307,9 +294,13 @@ bool OsightRadarDriver::recvOneFrameData(LidarData* data)
         char           recData[1460];
         memset(recData, 0, sizeof(recData));
         int nAddrLen = sizeof(mRemoteAddr);
-        int receiveSize = recvfrom(mSocket, recData, 1460, 0, (sockaddr*)&mRemoteAddr, &nAddrLen);
+        int receiveSize = recvfrom(mSocket, recData, 1460, 0, (sockaddr*)&mRemoteCmp, &nAddrLen);
         if (receiveSize > 6)
         {
+            if (mRemoteCmp.sin_addr.S_un.S_addr != mRemoteAddr.sin_addr.S_un.S_addr)
+            {
+                continue;
+            }
             UINT16 crc;
             memcpy(&crc, recData + receiveSize - 2, 2);
             if (N_CRC16((UINT8*)recData, receiveSize - 2) == NtoHS(crc))

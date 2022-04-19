@@ -1,5 +1,7 @@
 #include "osight_measure_thread.h"
 #include <time.h>
+#include <QTextStream>
+#include "exinova_cloud_cfile.h"
 OsightMeasureTread::OsightMeasureTread(QObject* parent)
     :QThread(parent)
     ,mRadarAddr("192.168.1.10")
@@ -98,6 +100,7 @@ void OsightMeasureTread::pause()
     if (QThread::isRunning())
     {
         mPauseFlag = true;
+        mpRadarDevice->stopMeasure();
     }
 }
 
@@ -111,15 +114,17 @@ void OsightMeasureTread::resume()
 
 void OsightMeasureTread::run()
 {
-    if (mpRadarDevice->open(mRadarAddr.toStdString().c_str(),
+    if (mpRadarDevice->open(mLocalAddr.toStdString().c_str(), 
+        mLocalPort,mRadarAddr.toStdString().c_str(),
         mRadarPort,
-        mLocalAddr.toStdString().c_str(),
-        mLocalPort,
         3000))
     {
         //TODO:参数配置
         mpRadarDevice->setParams();
         int nTry = 10;
+        //文件操作类
+        ExinovaDataFile file;
+        bool isOpen = false;
         while (nTry > 0 && !mStopFlag)
         {
             if (!mPauseFlag)
@@ -128,6 +133,17 @@ void OsightMeasureTread::run()
                 int pointNum = mpRadarDevice->getPointNum();
                 if (pointNum > 0)
                 {
+                    if (mWriteEnabled)
+                    {
+                        file.setFilePath(mFilePath.toStdString().c_str());
+                        if (file.open(ExinovaDataFile::WRITEONLY) < 0)
+                        {
+                            file.close();
+                            return;
+                        }
+
+                        isOpen = true;
+                    }
                     nTry = 10;
                     //申请内存
                     LidarData* pData = new LidarData[pointNum];
@@ -137,38 +153,23 @@ void OsightMeasureTread::run()
                     {
                         if (mpRadarDevice->getOneFrameData(pData))
                         {
+                            if (!isOpen)
+                            {
+                                file.setFilePath(mFilePath.toStdString().c_str());
+                                if (file.open(ExinovaDataFile::WRITEONLY) < 0)
+                                    isOpen = false;
+                                else
+                                    isOpen = true;
+                            }
                             lidarDataToCloud(pData, pointNum);
+                            if (mWriteEnabled)
+                            {
+                                file.write(mCloud);
+                            }
                         }
                         else
                         {
-                            clock_t startTime = clock();
-                            State sta = state();
-                            while (sta == Running)
-                            {
-                                //TODO:重连30分钟
-                                if (((double)(clock() - startTime) / CLOCKS_PER_SEC) >= 1800)
-                                {
-                                    stop();
-                                    emit sigRadarConnectFailed(mpRadarDevice->getIp());
-                                    return;
-                                }
-                                else
-                                {
-                                    pointNum = mpRadarDevice->getPointNum();
-                                    if (pointNum > 0)
-                                    {
-                                        resume();
-                                        startTime = clock();
-                                        //清除缓存区
-                                        delete[] pData;
-                                        //重新申请缓存区数据
-                                        pData = new LidarData[pointNum];
-                                        //重新启动测量
-                                        mpRadarDevice->startMeasure();
-                                        break;
-                                    }
-                                }
-                            }
+                            continue;
                         }
                     }
                     delete[] pData;
@@ -176,6 +177,7 @@ void OsightMeasureTread::run()
                 --nTry;
             }
         }
+        file.close();
     }
     else
     {
@@ -187,7 +189,7 @@ void OsightMeasureTread::run()
 
 void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
 {
-    QMutexLocker locker(&mMutex);
+    //QMutexLocker locker(&mMutex);
     mCloud.data()->clear();
     PointT poi;
     for (int i = 0; i < pointNum; ++i)
@@ -202,6 +204,5 @@ void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
         poi.a = 255;
         mCloud.data()->push_back(poi);
     }
-
     emit sigCloudPointUpdated(mpRadarDevice->getIp());
 }

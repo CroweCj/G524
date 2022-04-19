@@ -1,5 +1,6 @@
 #include "radar_manager.h"
 #include "cloud_data_process.h"
+#include "config_setting.h"
 RadarManager::RadarManager()
 {
     init();
@@ -12,6 +13,9 @@ RadarManager::~RadarManager()
     {
         QObject::disconnect(it.value(), &OsightMeasureTread::sigCloudPointUpdated,
             this, &RadarManager::threadCloudUpdate);
+        it.value()->stop();
+        it.value()->getDevice()->stopMeasure();
+        it.value()->getDevice()->close();
         it.value()->deleteLater();
     }
 }
@@ -37,6 +41,25 @@ bool RadarManager::addDevice(const QString& ip, const int& port, int type)
         pThread->getDevice()->setIp(ip);
         pThread->getDevice()->setPort(port);
         pThread->setRadarAddr(ip, port);
+        //TODO:先从配置中获取对应本地端口
+        if (type == OsightDevice::RADAR_B)
+        {
+            pThread->setLocalAddr(
+                ExinovaSettings::value("local/ip").toString(),
+                ExinovaSettings::value("local/port2b").toInt());
+        }
+        else if (type == OsightDevice::RADAR_E)
+        {
+            pThread->setLocalAddr(
+                ExinovaSettings::value("local/ip").toString(),
+                ExinovaSettings::value("local/port2e").toInt());
+        }
+        else
+        {
+            pThread->setLocalAddr(
+                ExinovaSettings::value("local/ip").toString(),
+                ExinovaSettings::value("local/port2b").toInt());
+        }
         mDeviceMap.insert(ip, pThread);
 
         QObject::connect(pThread, &OsightMeasureTread::sigCloudPointUpdated, 
@@ -75,10 +98,14 @@ void RadarManager::connect(const QString& ip, const int& port, int type)
         //开始测量
         it.value()->getDevice()->setEnable(true);
         it.value()->resume();
+        if (!it.value()->isRunning())
+        {
+            it.value()->start();
+        }
     }
     else
     {
-        if (addDevice(ip, type))
+        if (addDevice(ip, port, type))
         {
             mDeviceMap[ip]->getDevice()->setEnable(true);
             mDeviceMap[ip]->start();
@@ -168,6 +195,12 @@ PointCloudT::Ptr RadarManager::getOutlineCloud(const QString& ip)
     return mOutlineCloudMap[type].data();
 }
 
+void RadarManager::setFileName(const QString& ip, const QString& fileName)
+{
+    if(mDeviceMap[ip] != NULL)
+        mDeviceMap[ip]->setFileName(fileName,true);
+}
+
 void RadarManager::threadCloudUpdate(const QString& ip)
 {
     OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
@@ -200,8 +233,8 @@ void RadarManager::threadCloudUpdate(const QString& ip)
         if (mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
         {
             emit sigAOutlineUpdated(ip);
-        }
-        mOutlineCloudMap[type] = mDeviceMap[ip]->getCloud();
+            mOutlineCloudMap[type] += mDeviceMap[ip]->getCloud();
+        }     
     }
     else if (type == OsightDevice::RADAR_B)
     {
@@ -231,11 +264,14 @@ void RadarManager::threadCloudUpdate(const QString& ip)
     {
         QMutexLocker locker(&mMutex);
         emit sigEThreadCloudUpdated(ip);
-        if (mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
+
+        //TODO:暂时用b雷达测得速度
+        if (mpDataProcess->getSpeed(OsightDevice::RADAR_B) > 0
+            &&mpDataProcess->detectorOutline(type, mDeviceMap[ip]->getCloud()))
         {
             emit sigEOutlineUpdated(ip);
+            mOutlineCloudMap[type] += mDeviceMap[ip]->getCloud();
         }
-        mOutlineCloudMap[type] = mDeviceMap[ip]->getCloud();
     }
     else
     {
