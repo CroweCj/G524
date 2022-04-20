@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include <math.h>
 #include <QFileDialog>
-#include "cloud_data_read_thread.h"
 #define CLOUD_TEST
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -37,7 +36,7 @@ MainWindow::~MainWindow()
 {
     updateSettings();
     delete mpRadarManager;
-    mpDataReadThread->deleteLater();
+    delete mpFileSelectWidget;
 }
 
 void MainWindow::init()
@@ -532,36 +531,32 @@ void MainWindow::updateShow(pcl::visualization::PCLVisualizer::Ptr viewer, const
 
 void MainWindow::initFileRead()
 {
-    mpDataReadThread = new DataReadThread();
-
+    mpFileSelectWidget = new FileSelectWidget();
     connect(ui.actionOpenDir, &QAction::triggered, this, [=](bool togged) {
-        QString filePath = QFileDialog::getOpenFileName(this,
-            tr("Open Data File"),
-            tr("%1").arg(QApplication::applicationFilePath()),
-            tr("Data File(*.dat *.pcd *.txt)"));
-        mpDataReadThread->setFileName(filePath);
+        mpFileSelectWidget->showNormal();
         });
     connect(ui.actionPlay, &QAction::triggered, this, [=](bool togged) {
-        mpDataReadThread->start();
+        mpRadarManager->startDataRead();
         });
-    connect(mpDataReadThread, &DataReadThread::sigDataIsReady, this, [=]() {
-        PointCloudT::Ptr cloud = mpDataReadThread->getCloud().data();
-        viewerB->removeAllPointClouds();
-        viewerB->removeAllShapes();
-        viewerB->addPointCloud(cloud, "test");
-        viewerB->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "test");
-        viewerB->updatePointCloud(cloud, "test");
-        ui.qvtkWidget_B->update();
+    connect(mpFileSelectWidget, &FileSelectWidget::sigFilePathSaved, this, [=]() {
+        QMap<int, QString> filePathMap = mpFileSelectWidget->getFilePathMap();
+        for (int i = 0; i < filePathMap.size(); ++i)
+        {
+            //TODO:未判断文件是否存在
+            if (!filePathMap[i].isEmpty())
+            {
+                mpRadarManager->addDataRead(i, filePathMap[i]);
+            }
+        }
         });
 }
 
 void MainWindow::initFileWrite()
 {
     connect(ui.actionDataCol, &QAction::triggered, this, [=]() {
-        QString filePath = QFileDialog::getOpenFileName(this,
-            tr("Open Data File"),
-            tr("%1").arg(QApplication::applicationFilePath()),
-            tr("Data File(*.dat *.pcd *.txt)"));
+        QString filePath = QFileDialog::getExistingDirectory(this,
+            tr("Select Data Folder"),
+            tr("%1").arg(QApplication::applicationFilePath()));
         int index = ui.tabWidget_A->currentIndex();
         if (index == RADAR_B)
         {

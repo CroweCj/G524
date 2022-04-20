@@ -5,8 +5,16 @@ DataReadThread::DataReadThread(QObject* parent)
     , mPauseFlag(false)
     , mStopFlag(false)
 {
-
 }
+
+DataReadThread::DataReadThread(int type, QObject* parent)
+    : QThread(parent)
+    , mRadarType(type)
+    , mPauseFlag(false)
+    , mStopFlag(false)
+{
+}
+
 
 DataReadThread::~DataReadThread()
 {
@@ -61,8 +69,8 @@ void DataReadThread::run()
             //TODO:ÔÝÍ££¬Í£Ö¹Î´ÓÃ
             while (file.read(mCloud) >= 0)
             {
-                emit sigDataIsReady();
-                msleep(1);
+                emit sigDataIsReady(mRadarType);
+                msleep(5);
             }
         }
         file.close();

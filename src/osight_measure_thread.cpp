@@ -1,6 +1,8 @@
 #include "osight_measure_thread.h"
 #include <time.h>
 #include <QTextStream>
+#include <QDateTime>
+#include <QFileInfo>
 #include "exinova_cloud_cfile.h"
 OsightMeasureTread::OsightMeasureTread(QObject* parent)
     :QThread(parent)
@@ -135,6 +137,7 @@ void OsightMeasureTread::run()
                 {
                     if (mWriteEnabled)
                     {
+                        getFileName();
                         file.setFilePath(mFilePath.toStdString().c_str());
                         if (file.open(ExinovaDataFile::WRITEONLY) < 0)
                         {
@@ -155,6 +158,7 @@ void OsightMeasureTread::run()
                         {
                             if (!isOpen)
                             {
+                                getFileName();
                                 file.setFilePath(mFilePath.toStdString().c_str());
                                 if (file.open(ExinovaDataFile::WRITEONLY) < 0)
                                     isOpen = false;
@@ -205,4 +209,26 @@ void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
         mCloud.data()->push_back(poi);
     }
     emit sigCloudPointUpdated(mpRadarDevice->getIp());
+}
+
+QString OsightMeasureTread::getFileName()
+{
+    QString timeStr = QDateTime::currentDateTime().toString("yyyyMMddHHmmss").toLocal8Bit();
+    QStringList ipLst = mpRadarDevice->getIp().split(".");
+    QString ipStr;
+    for (int i = 0; i < ipLst.size(); ++i)
+    {
+        ipStr += QString("_") + ipLst[i];
+    }
+    mFilePath += QString("/") + timeStr + ipStr + QString(".dat");
+
+    //判断文件是否存在，不存在则创建
+    QFile file(mFilePath);
+    if (!file.exists())
+    {
+        file.open(QIODevice::ReadOnly);
+        file.close();
+    }
+
+    return mFilePath;
 }

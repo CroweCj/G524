@@ -14,6 +14,7 @@
 #include "osight_measure_thread.h"
 
 class SingleRadarProcess;
+class DataReadThread;
 
 class RadarManager : public QObject
 {
@@ -57,7 +58,9 @@ public:
     PointCloudT::Ptr getOutlineCloud(const QString& ip);
     
     void setFileName(const QString& ip, const QString& fileName);
-
+    //添加数据读取
+    void addDataRead(int radarType, const QString& filePath);
+    void startDataRead();
 signals:
     void sigAThreadCloudUpdated(const QString& ip);
     void sigBThreadCloudUpdated(const QString& ip);
@@ -70,7 +73,10 @@ signals:
     void sigAOutlineUpdated(const QString& ip);
     void sigEOutlineUpdated(const QString& ip);
 public slots:
+    //测量线程数据刷新
     void threadCloudUpdate(const QString& ip);
+    //数据读取线程数据刷新
+    void readThreadCloudUpdate(int radarType);
 private:
     //初始化信号与槽
     void initConnect();
@@ -83,7 +89,10 @@ private:
     std::map<int, ExinovaCloudData> mOutlineCloudMap;
     //数据处理类
     SingleRadarProcess* mpDataProcess;
-
+    //存储线程读取
+    //0-A 1-B 2-C 3-D 4-E
+    QMap<int, DataReadThread*> mDataReadMap;
+    //锁
     QMutex mMutex;
 };
 #endif // EXINOVA_G524_RADAR_MANAGER__H__

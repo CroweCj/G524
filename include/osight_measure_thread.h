@@ -47,7 +47,7 @@ public:
 
     State state() const;
 
-    void setFileName(const QString& fileName, bool writeEnabled) { mFilePath = fileName; mWriteEnabled = writeEnabled; }
+    void setFileName(const QString& filePath, bool writeEnabled) { mFilePath = filePath; mWriteEnabled = writeEnabled; }
 
 public slots:
     void start(Priority pri = InheritPriority);
@@ -64,6 +64,7 @@ protected:
 private:
     void lidarDataToCloud(LidarData* pData, int pointNum);
 
+    QString getFileName();
 signals:
     void sigRadarConnectFailed(const QString& ip);
 

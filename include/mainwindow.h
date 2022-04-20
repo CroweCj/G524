@@ -17,8 +17,7 @@
 #include "cloud_data_process.h"
 #include "config_setting.h"
 #include "radar_manager.h"
-//#include "cloud_data_read_thread.h"
-class DataReadThread;
+#include "file_select_widget.h"
 
 typedef enum FunctionWidgetIndex
 {
@@ -114,13 +113,11 @@ private:
     pcl::visualization::PCLVisualizer::Ptr viewerA, viewerB, viewerC, viewerD, viewerE;
     //用于车辆轮廓点云显示
     pcl::visualization::PCLVisualizer::Ptr viewerShow;
-
     RadarManager* mpRadarManager;
-
-    //文件读取线程
-    DataReadThread* mpDataReadThread;
-
+    //锁
     QMutex mMutex;
+    //文件路径选择界面
+    FileSelectWidget* mpFileSelectWidget;
 };
 
 #endif // OSIGHT_RADAR_PCL_MAINWINDOW__H__

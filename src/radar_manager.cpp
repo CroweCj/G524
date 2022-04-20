@@ -1,6 +1,7 @@
 #include "radar_manager.h"
 #include "cloud_data_process.h"
 #include "config_setting.h"
+#include "cloud_data_read_thread.h"
 RadarManager::RadarManager()
 {
     init();
@@ -11,12 +12,23 @@ RadarManager::~RadarManager()
     QMap<QString, OsightMeasureTread*>::iterator it;
     for (it = mDeviceMap.begin(); it != mDeviceMap.end(); ++it)
     {
-        QObject::disconnect(it.value(), &OsightMeasureTread::sigCloudPointUpdated,
-            this, &RadarManager::threadCloudUpdate);
-        it.value()->stop();
-        it.value()->getDevice()->stopMeasure();
-        it.value()->getDevice()->close();
-        it.value()->deleteLater();
+        if (it.value() != NULL)
+        {
+            it.value()->stop();
+            it.value()->getDevice()->stopMeasure();
+            it.value()->getDevice()->close();
+            it.value()->deleteLater();
+        }
+    }
+
+    QMap<int, DataReadThread*>::iterator itdata;
+    for (itdata = mDataReadMap.begin(); itdata != mDataReadMap.end(); ++itdata)
+    {
+        if (itdata.value() != NULL)
+        {
+            itdata.value()->stop();
+            itdata.value()->deleteLater();
+        }
     }
 }
 
@@ -201,6 +213,35 @@ void RadarManager::setFileName(const QString& ip, const QString& fileName)
         mDeviceMap[ip]->setFileName(fileName,true);
 }
 
+void RadarManager::addDataRead(int radarType, const QString& filePath)
+{
+    QMap<int, DataReadThread*>::iterator it = mDataReadMap.find(radarType);
+    if (it != mDataReadMap.end())
+    {
+        it.value()->setRadarType(radarType);
+        it.value()->setFileName(filePath);
+    }
+    else
+    {
+        DataReadThread* pDataThread = new DataReadThread(radarType);
+        pDataThread->setFileName(filePath);
+        mDataReadMap.insert(radarType, pDataThread);
+        QObject::connect(pDataThread, &DataReadThread::sigDataIsReady, this, &RadarManager::readThreadCloudUpdate);
+    }
+}
+
+void RadarManager::startDataRead()
+{
+    QMap<int, DataReadThread*>::iterator it = mDataReadMap.begin();
+    for (it; it != mDataReadMap.end(); ++it)
+    {
+        if (it.value() != NULL)
+        {
+            it.value()->start();
+        }
+    }
+}
+
 void RadarManager::threadCloudUpdate(const QString& ip)
 {
     OsightDevice::RadarNumber type = mDeviceMap[ip]->getDevice()->getRadarNumber();
@@ -271,6 +312,52 @@ void RadarManager::threadCloudUpdate(const QString& ip)
         {
             emit sigEOutlineUpdated(ip);
             mOutlineCloudMap[type] += mDeviceMap[ip]->getCloud();
+        }
+    }
+    else
+    {
+    }
+}
+
+void RadarManager::readThreadCloudUpdate(int radarType)
+{
+    if (radarType == OsightDevice::RADAR_A)
+    {
+        if (mpDataProcess->detectorOutline(radarType, mDataReadMap[radarType]->getCloud()))
+        {
+            mOutlineCloudMap[radarType] += mDataReadMap[radarType]->getCloud();
+        }
+    }
+    else if (radarType == OsightDevice::RADAR_B)
+    {
+        if (mpDataProcess->detectorSpeed(radarType, mDataReadMap[radarType]->getCloud()) > 0)
+        {
+            //TODO：待处理
+            double speed = mpDataProcess->getSpeed(OsightDevice::RADAR_B);
+            return;
+        }
+    }
+    else if (radarType == OsightDevice::RADAR_C)
+    {
+        if (mpDataProcess->detectorSpeed(radarType, mDataReadMap[radarType]->getCloud()) > 0)
+        {
+            //TODO：待处理
+        }
+    }
+    else if (radarType == OsightDevice::RADAR_D)
+    {
+        if (mpDataProcess->detectorSpeed(radarType, mDataReadMap[radarType]->getCloud()) > 0)
+        {
+            //TODO：待处理
+        }
+    }
+    else if (radarType == OsightDevice::RADAR_E)
+    {
+        //TODO:暂时用b雷达测得速度
+        if (mpDataProcess->getSpeed(OsightDevice::RADAR_B) > 0
+            && mpDataProcess->detectorOutline(radarType, mDataReadMap[radarType]->getCloud()))
+        {
+            mOutlineCloudMap[radarType] += mDataReadMap[radarType]->getCloud();
         }
     }
     else

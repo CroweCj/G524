@@ -15,21 +15,22 @@ class DataReadThread : public QThread
     Q_OBJECT
 public:
     DataReadThread(QObject* parent = NULL);
+    DataReadThread(int type,QObject* parent = NULL);
     ~DataReadThread();
 
     void setFileName(const QString& fileName);
 
     ExinovaCloudData& getCloud() {return mCloud;}
+
+    void setRadarType(int radarType) { mRadarType = radarType; }
+    int getRadrType() { return mRadarType; }
 signals:
-    void sigDataIsReady();
+    void sigDataIsReady(const int& radarType);
 
 public slots:
     void start(Priority pri = InheritPriority);
-
     void stop();
-
     void pause();
-
     void resume();
 
 protected:
@@ -45,5 +46,8 @@ private:
     std::atomic_bool mStopFlag;
     //文件地址
     QString mFileName;
+    //雷达类型
+    //0-A 1-B 2-C 3-D 4-E
+    std::atomic_int mRadarType;
 };
 #endif // EXINOVA_G524_CLOUD_DATA_READ_THREAD__H__
