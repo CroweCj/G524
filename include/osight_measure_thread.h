@@ -12,6 +12,9 @@
 #include <QMutex>
 #include "osight_device.h"
 #include "param_def.h"
+#include "exinova_cloud_cfile.h"
+
+
 class OsightMeasureTread : public QThread
 {
     Q_OBJECT
@@ -49,6 +52,10 @@ public:
 
     void setFileName(const QString& filePath, bool writeEnabled) { mFilePath = filePath; mWriteEnabled = writeEnabled; }
 
+	ExinovaDataFile GetFile() { return file; }
+
+
+
 public slots:
     void start(Priority pri = InheritPriority);
 
@@ -66,11 +73,11 @@ private:
 
     QString getFileName();
 signals:
-    void sigRadarConnectFailed(const QString& ip);
+    void sigRadarConnectFailed(const int type);
 
-    void sigRadarConnectSuccess(const QString& ip);
+    void sigRadarConnectSuccess(const int type);
 
-    void sigCloudPointUpdated(const QString& ip);
+    void sigCloudPointUpdated(const int type);
 
 private:
     //设备
@@ -95,6 +102,8 @@ private:
     std::atomic_bool mStopFlag;
     //文件地址
     QString mFilePath;
+
+    ExinovaDataFile file;
 
     std::atomic_bool mWriteEnabled;
 };

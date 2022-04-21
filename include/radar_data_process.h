@@ -9,7 +9,7 @@
 *****************************************************************************/
 #include <vector>
 #include <map>
-#include <QMutex>
+#include <mutex>
 #include "param_def.h"
 typedef struct ObjData
 {
@@ -41,26 +41,24 @@ class SingleRadarDataProcess
 {
 public:
     SingleRadarDataProcess();
-
     ~SingleRadarDataProcess();
-
     //获取轮廓
     bool detectorOutline(ExinovaCloudData& data);
     //获取速度
     double detectorSpeed(ExinovaCloudData& data);
     //StatisticalOutlierRemoval滤波
     void staOutlierRemovalFilter(ExinovaCloudData& data);
-
 private:
     void init();
     //计算速度
     double countSpeed(ExinovaCloudData& data, bool isReverse);
     //根据速度拼接数据
     bool coordinataTrans(ExinovaCloudData& data);
-
+    //移除无效点
+    bool removeZeroFromCloud(ExinovaCloudData& data);
 private:
     //锁
-    QMutex mMutex;
+    std::mutex mMutex;
     //基于速度拼接数据
     OutlineData mOutlineData;
     //速度数据

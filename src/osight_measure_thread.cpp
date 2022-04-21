@@ -3,7 +3,6 @@
 #include <QTextStream>
 #include <QDateTime>
 #include <QFileInfo>
-#include "exinova_cloud_cfile.h"
 OsightMeasureTread::OsightMeasureTread(QObject* parent)
     :QThread(parent)
     ,mRadarAddr("192.168.1.10")
@@ -125,7 +124,6 @@ void OsightMeasureTread::run()
         mpRadarDevice->setParams();
         int nTry = 10;
         //文件操作类
-        ExinovaDataFile file;
         bool isOpen = false;
         while (nTry > 0 && !mStopFlag)
         {
@@ -185,7 +183,7 @@ void OsightMeasureTread::run()
     }
     else
     {
-        emit sigRadarConnectFailed(mpRadarDevice->getIp());
+        emit sigRadarConnectFailed(mpRadarDevice->getRadarNumber());
         return;
     }
 }
@@ -208,7 +206,9 @@ void OsightMeasureTread::lidarDataToCloud(LidarData* pData, int pointNum)
         poi.a = 255;
         mCloud.data()->push_back(poi);
     }
-    emit sigCloudPointUpdated(mpRadarDevice->getIp());
+
+
+    emit sigCloudPointUpdated(mpRadarDevice->getRadarNumber());
 }
 
 QString OsightMeasureTread::getFileName()

@@ -106,7 +106,6 @@
     <ClInclude Include="include\exinova_point_cloud_data.h" />
     <QtMoc Include="include\file_select_widget.h" />
     <ClInclude Include="include\osight_def.h" />
-    <ClInclude Include="include\radar_data_process.h" />
     <ClInclude Include="include\socket_global.h" />
     <QtMoc Include="include\osight_device.h" />
     <ClInclude Include="include\osight_driver.h" />
@@ -127,7 +126,6 @@
     <ClCompile Include="src\osight_driver.cpp" />
     <ClCompile Include="src\osight_measure_thread.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
-    <ClCompile Include="src\radar_data_process.cpp" />
     <ClCompile Include="src\radar_manager.cpp" />
     <ClCompile Include="src\socket_global.cpp" />
   </ItemGroup>

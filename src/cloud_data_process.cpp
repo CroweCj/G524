@@ -3,28 +3,27 @@
 #include <QPair>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
-
+#include <pcl/filters/extract_indices.h>
 //TODO:目前不知道此参数具体用意
 const int POINTS_MIN_SIZE = 100;
 //TODO:经验值？
 const double MIN_SPEED = 5.311;
 
-SingleRadarProcess::SingleRadarProcess(int nums)
-    :mRadarNums(nums)
+RadarDataProcess::RadarDataProcess(int nums)
+    : mRadarNums(nums)
 {
     mHistoryFramesObs.clear();
 
     init();
 }
 
-SingleRadarProcess::~SingleRadarProcess()
+RadarDataProcess::~RadarDataProcess()
 {
 
 }
 
-bool SingleRadarProcess::detectorOutline(int radarId, ExinovaCloudData& data)
+bool RadarDataProcess::detectorOutline(int radarId, int speedRadarId, ExinovaCloudData& data)
 {
-
     QMutexLocker locker(&mMutex);
     std::map<int, DetectOutlineData>::iterator it = mOutlineMap.find(radarId);
     if (it == mOutlineMap.end())
@@ -40,14 +39,12 @@ bool SingleRadarProcess::detectorOutline(int radarId, ExinovaCloudData& data)
     {
         return false;
     }
-    else if (it->second.data.data()->empty()
-        && !data.data()->empty())
+    else if (mStatusMap[speedRadarId] == Car_In)
     {
         it->second.data += data;
         return false;
     }
-    else if (!it->second.data.data()->empty()
-        && !data.data()->empty())
+    else if (mStatusMap[speedRadarId] == Car_Run)
     {
         if (coordinataTrans(radarId, it->second.data))
         {
@@ -55,8 +52,7 @@ bool SingleRadarProcess::detectorOutline(int radarId, ExinovaCloudData& data)
         }
         return false;
     }
-    else if (!it->second.data.data()->empty()
-        && data.data()->empty())
+    else if (mStatusMap[speedRadarId] == Car_Out)
     {
         data += it->second.data;
         it->second.data.data()->clear();
@@ -74,7 +70,7 @@ bool SingleRadarProcess::detectorOutline(int radarId, ExinovaCloudData& data)
     return true;
 }
 
-double SingleRadarProcess::detectorSpeed(int radarId, ExinovaCloudData& data)
+double RadarDataProcess::detectorSpeed(int radarId, ExinovaCloudData& data)
 {
     QMutexLocker locker(&mMutex);
     std::map<int, DetectSpeedData>::iterator it = mSpeedMap.find(radarId);
@@ -84,21 +80,51 @@ double SingleRadarProcess::detectorSpeed(int radarId, ExinovaCloudData& data)
     }
     else
     {
-        it->second.data = data;
+        it->second.data.clearData();
+        it->second.data += data;
+        //离群点移除
+        detectorOutliers(radarId,it->second.data);
+        //无效点移除
+        removeZeroFromCloud(it->second.data);
         double speed = countSpeed(radarId, it->second.data, true);
         if (speed > MIN_SPEED)
         {
+            //识别出速度后判断标志位
+            //若之前为false，代表车辆驶入
+            //若之前为true,代表车辆还在行驶中
+            if (mIsHaveObjMap[radarId] == false)
+            {
+                mStatusMap[radarId] = Car_In;
+            }
+            else
+            {
+                mStatusMap[radarId] = Car_Run;
+            }
+            mIsHaveObjMap[radarId] = true;
             it->second.speed = speed;
             return speed;
         }
         else
         {
+            //未识别出速度后判断标志位
+            //若之前为false，代表无车辆
+            //若之前为true,代表车辆驶离
+            if (mIsHaveObjMap[radarId] == false)
+            {
+                mStatusMap[radarId] = None;
+            }
+            else
+            {
+                mStatusMap[radarId] = Car_Out;
+            }
+            mIsHaveObjMap[radarId] = false;
+            it->second.speed = 0;
             return 0;
         }
     }
 }
 
-void SingleRadarProcess::init()
+void RadarDataProcess::init()
 {
     for (int i = 0; i < mRadarNums; ++i)
     {
@@ -112,10 +138,12 @@ void SingleRadarProcess::init()
         mSpeedMap[i] = speedData;
         mOutlineMap[i] = outlineData;
         mHistoryFramesObs[i] = frameObs;
+        mIsHaveObjMap[i] = false;
+        mStatusMap[i] = None;
     }
 }
 
-double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool isReverse)
+double RadarDataProcess::countSpeed(int radarId, ExinovaCloudData& data, bool isReverse)
 {
     //历史数据
     std::map<int, std::vector<std::vector<OBJ>>>::iterator iter;
@@ -264,7 +292,7 @@ double SingleRadarProcess::countSpeed(int radarId, ExinovaCloudData& data, bool 
     return averageSpeed * 50;
 }
 
-bool SingleRadarProcess::coordinataTrans(int radarId, ExinovaCloudData& data)
+bool RadarDataProcess::coordinataTrans(int radarId, ExinovaCloudData& data)
 {
     std::map<int, DetectSpeedData>::const_iterator it = mSpeedMap.find(radarId);
     if (it == mSpeedMap.end())
@@ -283,7 +311,29 @@ bool SingleRadarProcess::coordinataTrans(int radarId, ExinovaCloudData& data)
     }
 }
 
-void SingleRadarProcess::updateXYZ(ExinovaCloudData& data)
+bool RadarDataProcess::removeZeroFromCloud(ExinovaCloudData& data)
+{
+    PointCloudT::Ptr cloud = data.data();
+    pcl::PointIndices::Ptr inliers(new pcl::PointIndices());
+    pcl::ExtractIndices<PointT> extract;
+    for (int i = 0; i < cloud->size(); ++i)
+    {
+        if (cloud->points[i].x == 0.0
+            && cloud->points[i].y == 0.0
+            && cloud->points[i].z == 0.0)
+        {
+            inliers->indices.push_back(i);
+        }
+    }
+    extract.setInputCloud(cloud);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*cloud);
+
+    return true;
+}
+
+void RadarDataProcess::updateXYZ(ExinovaCloudData& data)
 {
     double X_MIN, X_MAX, Y_MIN, Y_MAX, Z_MIN, Z_MAX;
     X_MIN = 9999;
@@ -319,7 +369,7 @@ void SingleRadarProcess::updateXYZ(ExinovaCloudData& data)
     data += transData;
 }
 
-double SingleRadarProcess::getSpeed(int id)
+double RadarDataProcess::getSpeed(int id)
 {
     QMutexLocker locker(&mMutex);
     std::map<int, DetectSpeedData>::const_iterator it = mSpeedMap.find(id);
@@ -333,7 +383,7 @@ double SingleRadarProcess::getSpeed(int id)
     }
 }
 
-void SingleRadarProcess::detectorOutliers(int num, ExinovaCloudData& data)
+void RadarDataProcess::detectorOutliers(int num, ExinovaCloudData& data)
 {
     pcl::PointCloud<pcl::PointXYZRGBA> outliers_data;
     pcl::StatisticalOutlierRemoval<pcl::PointXYZRGBA> sor;
@@ -345,7 +395,7 @@ void SingleRadarProcess::detectorOutliers(int num, ExinovaCloudData& data)
     data += outliers_data;
 }
 
-ExinovaCloudData SingleRadarProcess::getOutlineData(int id)
+ExinovaCloudData RadarDataProcess::getOutlineData(int id)
 {
     QMutexLocker locker(&mMutex);
     std::map<int, DetectOutlineData>::iterator it = mOutlineMap.find(id);

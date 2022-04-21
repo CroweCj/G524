@@ -32,15 +32,22 @@ typedef struct DetectOutlineData
     ExinovaCloudData data;
 }DetectOutlineData;
 
-class SingleRadarProcess
+class RadarDataProcess
 {
 public:
-    SingleRadarProcess(int nums = 0);
+    RadarDataProcess(int nums = 0);
 
-    ~SingleRadarProcess();
+    ~RadarDataProcess();
 
+    enum ObjStatus
+    {
+        Car_In = 0,     //车辆驶入
+        Car_Out,        //车辆离开
+        Car_Run,        //车辆在跑
+        None            //无车辆
+    };
     //获取轮廓
-    bool detectorOutline(int radarId, ExinovaCloudData& data);
+    bool detectorOutline(int radarId,int speedRadarId, ExinovaCloudData& data);
     //获取速度
     double detectorSpeed(int radarId, ExinovaCloudData& data);
     //
@@ -58,6 +65,8 @@ private:
     double countSpeed(int radarId, ExinovaCloudData& data, bool isReverse);
 
     bool coordinataTrans(int radarId, ExinovaCloudData& data);
+    
+    bool removeZeroFromCloud(ExinovaCloudData& data);
 private:
     //雷达数量
     int mRadarNums;
@@ -69,5 +78,9 @@ private:
     std::map<int, DetectOutlineData> mOutlineMap;
     //历史帧
     std::map<int, std::vector<std::vector<OBJ>>> mHistoryFramesObs;
+    //
+    std::map<int, std::atomic_bool> mIsHaveObjMap;
+    //目标状态
+    std::map <int,ObjStatus> mStatusMap;
 };
 #endif // EXINOVA_G524_EXINOVA_CLOUD_DATA_PROCESS__H__

@@ -4,6 +4,7 @@ DataReadThread::DataReadThread(QObject* parent)
     : QThread(parent)
     , mPauseFlag(false)
     , mStopFlag(false)
+    , mNextFrame(false)
 {
 }
 
@@ -12,6 +13,7 @@ DataReadThread::DataReadThread(int type, QObject* parent)
     , mRadarType(type)
     , mPauseFlag(false)
     , mStopFlag(false)
+    , mNextFrame(false)
 {
 }
 
@@ -67,10 +69,16 @@ void DataReadThread::run()
         if (file.open(ExinovaDataFile::READONLY) == 0)
         {
             //TODO:暂停，停止未用
-            while (file.read(mCloud) >= 0)
+            //一帧一帧取数据
+            while (!mStopFlag)
             {
-                emit sigDataIsReady(mRadarType);
-                msleep(5);
+                while (mNextFrame 
+                    &&file.read(mCloud) >= 0)
+                {
+                    emit sigDataIsReady(mRadarType);
+                    msleep(5);
+                    mNextFrame = false;
+                }
             }
         }
         file.close();

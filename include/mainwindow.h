@@ -99,10 +99,8 @@ private:
     //更新ini文件
     void updateSettings();
 
-    void updateShow(pcl::visualization::PCLVisualizer::Ptr viewer,
-        const QString& ip,
-        const QString& cloudId);
-
+    //数据刷新
+    void updateShow(const int type,bool isRead);
     void initFileRead();
 
     void initFileWrite();
@@ -118,6 +116,10 @@ private:
     QMutex mMutex;
     //文件路径选择界面
     FileSelectWidget* mpFileSelectWidget;
+
+	QString pause = QStringLiteral("暂停");
+	QString resume = QStringLiteral("继续");
+    
 };
 
 #endif // OSIGHT_RADAR_PCL_MAINWINDOW__H__

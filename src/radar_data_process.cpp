@@ -1,7 +1,7 @@
 #include "radar_data_process.h"
-#include <QMutexLocker>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+#include <pcl/filters/extract_indices.h>
 
 //TODO:目前不知道此参数具体用意
 const int POINTS_MIN_SIZE = 100;
@@ -20,8 +20,7 @@ SingleRadarDataProcess::~SingleRadarDataProcess()
 
 bool SingleRadarDataProcess::detectorOutline(ExinovaCloudData& data)
 {
-    QMutexLocker locker(&mMutex);
-
+    std::lock_guard<std::mutex> lock(mMutex);
     if (!mOutlineData.enable)
     {
         return false;
@@ -70,9 +69,14 @@ bool SingleRadarDataProcess::detectorOutline(ExinovaCloudData& data)
 
 double SingleRadarDataProcess::detectorSpeed(ExinovaCloudData& data)
 {
-    QMutexLocker locker(&mMutex);
-    mSpeedData.data = data;
-    double speed = countSpeed(data, true);
+    std::lock_guard<std::mutex> lock(mMutex);
+    mSpeedData.data.clearData();
+    mSpeedData.data += data;
+    //离群点移除
+    staOutlierRemovalFilter(mSpeedData.data);
+    //无效点移除
+    removeZeroFromCloud(mSpeedData.data);
+    double speed = countSpeed(mSpeedData.data, true);
     if (speed > MIN_SPEED)
     {
         mSpeedData.speed = speed;
@@ -89,7 +93,7 @@ void SingleRadarDataProcess::staOutlierRemovalFilter(ExinovaCloudData& data)
     pcl::PointCloud<pcl::PointXYZRGBA> outliers_data;
     pcl::StatisticalOutlierRemoval<pcl::PointXYZRGBA> sor;
     sor.setInputCloud(data.data());
-    sor.setMeanK(10);
+    sor.setMeanK(1);
     sor.setStddevMulThresh(1.0);
     sor.filter(outliers_data);
     data.data()->clear();
@@ -250,6 +254,33 @@ double SingleRadarDataProcess::countSpeed(ExinovaCloudData& data, bool isReverse
 
 bool SingleRadarDataProcess::coordinataTrans(ExinovaCloudData& data)
 {
-    //TODO
-    return false;
+    PointCloudT transData;
+    Eigen::Affine3f transForm = Eigen::Affine3f::Identity();
+    transForm.translation() << 0.0, 0.0, 0.02 * mSpeedData.speed;
+    pcl::transformPointCloud(*data.data(), transData, transForm);
+    data.data()->clear();
+    data += transData;
+    return true;
+}
+
+bool SingleRadarDataProcess::removeZeroFromCloud(ExinovaCloudData& data)
+{
+    PointCloudT::Ptr cloud = data.data();
+    pcl::PointIndices::Ptr inliers(new pcl::PointIndices());
+    pcl::ExtractIndices<PointT> extract;
+    for (int i = 0; i < cloud->size(); ++i)
+    {
+        if (cloud->points[i].x == 0.0
+            && cloud->points[i].y == 0.0
+            && cloud->points[i].z == 0.0)
+        {
+            inliers->indices.push_back(i);
+        }
+    }
+    extract.setInputCloud(cloud);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*cloud);
+
+    return true;
 }

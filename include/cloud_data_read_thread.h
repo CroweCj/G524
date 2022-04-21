@@ -8,7 +8,7 @@
 * @Version: ver 1.0
 *****************************************************************************/
 #include <QThread>
-#include <QMutex>
+#include <mutex>
 #include "param_def.h"
 class DataReadThread : public QThread
 {
@@ -24,6 +24,7 @@ public:
 
     void setRadarType(int radarType) { mRadarType = radarType; }
     int getRadrType() { return mRadarType; }
+    void nextFrame(bool nextFrame = false) { mNextFrame = nextFrame; }
 signals:
     void sigDataIsReady(const int& radarType);
 
@@ -39,7 +40,7 @@ private:
     //点云数据
     ExinovaCloudData mCloud;
     //锁
-    QMutex mMutex;
+    std::mutex mMutex;
     //暂停标志
     std::atomic_bool mPauseFlag;
     //终止标志
@@ -49,5 +50,7 @@ private:
     //雷达类型
     //0-A 1-B 2-C 3-D 4-E
     std::atomic_int mRadarType;
+
+    std::atomic_bool mNextFrame;
 };
 #endif // EXINOVA_G524_CLOUD_DATA_READ_THREAD__H__
